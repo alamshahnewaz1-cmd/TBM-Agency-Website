@@ -45,10 +45,10 @@ export const metadata: Metadata = {
     siteName: "The Backstage Marketing",
     images: [
       {
-        url: "/images/tbm-logo.png",
-        width: 1000,
-        height: 1000,
-        alt: "The Backstage Marketing",
+        url: "/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "The Backstage Marketing — Built backstage. Made for the spotlight.",
       },
     ],
   },
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     title: "The Backstage Marketing | Creative Growth Agency",
     description:
       "Strategy, branding, social media and growth — built backstage, made for the spotlight.",
-    images: ["/images/tbm-logo.png"],
+    images: ["/images/og-image.png"],
   },
   robots: {
     index: true,
@@ -81,6 +81,28 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} bg-background`}>
       <body className="font-sans antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "The Backstage Marketing",
+              alternateName: "TBM",
+              url: siteUrl,
+              logo: `${siteUrl}/images/tbm-logo.png`,
+              email: "inquiry.tbm@protonmail.com",
+              description:
+                "A creative growth agency for branding, brand strategy, social media, content creation and performance campaigns.",
+              slogan: "Built backstage. Made for the spotlight.",
+              sameAs: [
+                "https://instagram.com",
+                "https://linkedin.com",
+                "https://behance.net",
+              ],
+            }),
+          }}
+        />
         <div className="noise" aria-hidden="true" />
         <SiteHeader />
         <main>{children}</main>
