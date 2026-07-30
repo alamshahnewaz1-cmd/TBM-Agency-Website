@@ -1,11 +1,24 @@
+import {
+  Compass,
+  Palette,
+  Share2,
+  Camera,
+  Megaphone,
+  Globe,
+  LineChart,
+  type LucideIcon,
+} from "lucide-react"
+
 export type Service = {
   slug: string
   title: string
   tagline: string
+  summary: string
   description: string
   deliverables: string[]
   forWho: string
   outcomes: string[]
+  icon: LucideIcon
 }
 
 export const services: Service[] = [
@@ -13,6 +26,9 @@ export const services: Service[] = [
     slug: "brand-strategy",
     title: "Brand Strategy",
     tagline: "The thinking before the making.",
+    icon: Compass,
+    summary:
+      "Positioning, messaging and a strategic foundation every creative decision is measured against.",
     description:
       "We define who you are, who you serve and why you win. Positioning, messaging and a clear strategic foundation that every creative decision can be measured against.",
     deliverables: [
@@ -34,6 +50,9 @@ export const services: Service[] = [
     slug: "brand-identity",
     title: "Brand Identity",
     tagline: "A look that behaves like an asset.",
+    icon: Palette,
+    summary:
+      "Logo, type, colour and a full visual system engineered for consistency everywhere.",
     description:
       "Logos, type, colour and a full visual system engineered for consistency across every touchpoint — from a phone screen to a storefront.",
     deliverables: [
@@ -55,6 +74,9 @@ export const services: Service[] = [
     slug: "social-media-marketing",
     title: "Social Media Marketing",
     tagline: "Show up like the brand you want to be.",
+    icon: Share2,
+    summary:
+      "End-to-end social — strategy, content, publishing, community and reporting — built to convert.",
     description:
       "End-to-end social management — strategy, content calendars, publishing, community and reporting — built to grow reach that actually converts.",
     deliverables: [
@@ -76,6 +98,9 @@ export const services: Service[] = [
     slug: "content-creation",
     title: "Content Creation",
     tagline: "Stories worth stopping for.",
+    icon: Camera,
+    summary:
+      "Photo, short-form video, graphics and copy — produced in batches so channels never run dry.",
     description:
       "Photography, short-form video, graphics and copy — produced in themed batches so your channels never run dry and always feel intentional.",
     deliverables: [
@@ -97,6 +122,9 @@ export const services: Service[] = [
     slug: "creative-campaigns",
     title: "Creative Campaigns",
     tagline: "Ideas big enough to be remembered.",
+    icon: Megaphone,
+    summary:
+      "Concept-led campaigns that connect one idea across social, paid, content and activations.",
     description:
       "Concept-led campaigns that connect a single idea across social, paid, content and activations — built to earn attention and move numbers.",
     deliverables: [
@@ -118,6 +146,9 @@ export const services: Service[] = [
     slug: "website-design",
     title: "Website Design",
     tagline: "The home base that converts.",
+    icon: Globe,
+    summary:
+      "Fast, responsive, conversion-focused websites that reflect your brand and drive inquiries.",
     description:
       "Fast, responsive, conversion-focused websites designed and built to reflect your brand and turn visitors into inquiries.",
     deliverables: [
@@ -139,6 +170,9 @@ export const services: Service[] = [
     slug: "performance-marketing",
     title: "Performance Marketing",
     tagline: "Spend that pays its way.",
+    icon: LineChart,
+    summary:
+      "Paid media across Meta, Google and beyond — structured, tested and optimised for ROAS.",
     description:
       "Paid media across Meta, Google and beyond — structured, tested and optimised against the metrics that matter to your business.",
     deliverables: [

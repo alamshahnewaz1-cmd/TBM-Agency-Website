@@ -4,11 +4,16 @@ import { site } from "@/lib/site"
 
 export function Logo({
   showText = true,
+  variant = "dark",
   className = "",
 }: {
   showText?: boolean
+  variant?: "dark" | "light"
   className?: string
 }) {
+  const textColor = variant === "light" ? "text-paper" : "text-ink"
+  const subColor = variant === "light" ? "text-paper/60" : "text-muted"
+
   return (
     <Link
       href="/"
@@ -26,9 +31,9 @@ export function Logo({
         />
       </span>
       {showText && (
-        <span className="text-[15px] font-extrabold leading-none tracking-tight">
+        <span className={`text-[15px] font-extrabold leading-none tracking-tight ${textColor}`}>
           The Backstage
-          <span className="block text-[11px] font-semibold uppercase tracking-[0.28em] text-muted">
+          <span className={`block text-[11px] font-semibold uppercase tracking-[0.28em] ${subColor}`}>
             Marketing
           </span>
         </span>

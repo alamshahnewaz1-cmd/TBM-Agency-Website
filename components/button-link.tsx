@@ -2,16 +2,18 @@ import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import type { ComponentProps } from "react"
 
-type Variant = "primary" | "solid" | "ghost"
+type Variant = "primary" | "ink" | "ghost" | "light"
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full text-sm font-semibold transition-all duration-200 min-h-11 px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+  "inline-flex items-center justify-center gap-2 rounded-full text-sm font-semibold transition-all duration-200 min-h-11 px-6 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
 
 const variants: Record<Variant, string> = {
-  primary: "bg-accent text-paper hover:bg-accent-2",
-  solid: "bg-paper text-background hover:bg-paper-2",
+  primary: "bg-accent text-paper hover:bg-accent-2 focus-visible:ring-offset-background",
+  ink: "bg-ink text-paper hover:bg-ink-2 focus-visible:ring-offset-background",
   ghost:
-    "border border-line-strong text-foreground hover:border-foreground hover:bg-[rgba(244,243,239,0.06)]",
+    "border border-line-strong text-ink hover:border-ink hover:bg-black/[0.04] focus-visible:ring-offset-background",
+  light:
+    "border border-paper/25 text-paper hover:bg-paper hover:text-ink focus-visible:ring-offset-ink",
 }
 
 type ButtonLinkProps = {
