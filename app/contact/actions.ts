@@ -8,6 +8,10 @@ export type ContactState = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+// FormSubmit AJAX endpoint delivers straight to this inbox.
+// Running it server-side keeps the address off the client and avoids CORS.
+const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/inquiry.tbm@protonmail.com"
+
 export async function submitContact(
   _prev: ContactState,
   formData: FormData,
@@ -29,17 +33,75 @@ export async function submitContact(
     return { status: "error", message: "Please fix the highlighted fields.", errors }
   }
 
-  // Silently accept spam without doing anything.
+  // Silently accept spam without sending anything.
   if (website) {
     return { status: "success", message: "Thanks! We'll be in touch shortly." }
   }
 
-  // No email provider is connected yet, so we log the inquiry server-side.
-  // Swap this for an email/CRM integration (e.g. Resend, a database insert) later.
-  console.log("[v0] New contact inquiry:", { name, email, company, budget, message })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 15000)
 
-  return {
-    status: "success",
-    message: "Thanks for reaching out! We've received your message and will reply within 1–2 business days.",
+  try {
+    const res = await fetch(FORMSUBMIT_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        // A browser-like User-Agent is required, otherwise FormSubmit's
+        // Cloudflare layer serves a bot challenge and the request 403s.
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+        Origin: "https://formsubmit.co",
+        Referer: "https://formsubmit.co/",
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        company: company || "—",
+        budget: budget || "—",
+        message,
+        _subject: `New inquiry from ${name}${company ? ` (${company})` : ""}`,
+        _template: "table",
+        _captcha: "false",
+        _replyto: email,
+      }),
+      signal: controller.signal,
+      cache: "no-store",
+    })
+
+    const data = (await res.json().catch(() => null)) as
+      | { success?: string | boolean; message?: string }
+      | null
+    const ok = res.ok && (data?.success === "true" || data?.success === true)
+
+    if (!ok) {
+      const needsActivation = /activat/i.test(data?.message ?? "")
+      if (needsActivation) {
+        // One-time setup: the FormSubmit "Activate Form" email must be clicked
+        // from the inquiry.tbm@protonmail.com inbox before delivery begins.
+        console.log("[v0] FormSubmit awaiting activation — click the link in the inbox:", data?.message)
+      } else {
+        console.log("[v0] FormSubmit send failed:", res.status, data)
+      }
+      return {
+        status: "error",
+        message:
+          "Sorry — something went wrong sending your message. Please try again or email inquiry.tbm@protonmail.com directly.",
+      }
+    }
+
+    return {
+      status: "success",
+      message: "Thanks for reaching out! We've received your message and will reply within 1–2 business days.",
+    }
+  } catch (err) {
+    console.log("[v0] Contact submission error:", err)
+    return {
+      status: "error",
+      message:
+        "Sorry — we couldn't send your message right now. Please try again or email inquiry.tbm@protonmail.com directly.",
+    }
+  } finally {
+    clearTimeout(timeout)
   }
 }
