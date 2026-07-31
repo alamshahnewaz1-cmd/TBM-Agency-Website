@@ -3,37 +3,26 @@ import { ArrowUpRight, ArrowRight } from "lucide-react"
 import { ButtonLink } from "@/components/button-link"
 import { Reveal } from "@/components/reveal"
 import { Eyebrow, SectionHeading } from "@/components/section-heading"
-import { services } from "@/lib/services"
-import { projects } from "@/lib/projects"
-import { testimonials } from "@/lib/testimonials"
-import { site } from "@/lib/site"
+import { getServices } from "@/lib/data/services"
+import { getProjects } from "@/lib/data/projects"
+import { getTestimonials } from "@/lib/data/testimonials"
+import { getHomepage } from "@/lib/data/homepage"
+import { getSiteSettings, siteLogoUrl } from "@/lib/data/site"
 
-const stats = [
-  { value: "40+", label: "Brands launched & scaled" },
-  { value: "3.4x", label: "Avg. return on ad spend" },
-  { value: "12M+", label: "Organic impressions driven" },
-  { value: "98%", label: "Client retention rate" },
-]
+export default async function HomePage() {
+  const [home, services, projects, testimonials, settings] = await Promise.all([
+    getHomepage(),
+    getServices(),
+    getProjects(),
+    getTestimonials(),
+    getSiteSettings(),
+  ])
 
-const process = [
-  { step: "01", title: "Discover", copy: "We dig into your market, audience and goals to find the real growth levers." },
-  { step: "02", title: "Design", copy: "Brand systems, messaging and creative concepts built to stand out and convert." },
-  { step: "03", title: "Deploy", copy: "We ship campaigns, content and assets across the channels that matter." },
-  { step: "04", title: "Drive", copy: "Continuous testing and reporting so performance compounds month over month." },
-]
+  const stats = home.stats
+  const process = home.processSteps
+  const marqueeItems = home.marqueeItems
+  const heroImage = siteLogoUrl(settings)
 
-const marqueeItems = [
-  "Brand Strategy",
-  "Social Media",
-  "Content Creation",
-  "Performance Ads",
-  "Web Design",
-  "Video Production",
-  "Campaigns",
-  "Creative Direction",
-]
-
-export default function HomePage() {
   return (
     <>
       {/* Hero */}
@@ -41,27 +30,26 @@ export default function HomePage() {
         <div className="mx-auto grid w-full max-w-6xl gap-12 px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div className="flex flex-col gap-7">
             <Reveal>
-              <Eyebrow>Creative growth agency</Eyebrow>
+              <Eyebrow>{home.heroEyebrow}</Eyebrow>
             </Reveal>
             <Reveal delay={80}>
               <h1 className="text-balance text-5xl font-black leading-[0.98] tracking-tight sm:text-6xl md:text-7xl">
-                Built backstage.{" "}
-                <span className="text-accent">Made for the spotlight.</span>
+                {home.heroTitleLead}{" "}
+                <span className="text-accent">{home.heroTitleHighlight}</span>
               </h1>
             </Reveal>
             <Reveal delay={160}>
               <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted">
-                {site.name} is the team behind the brands you notice. We craft identity, content and
-                campaigns that turn attention into measurable growth.
+                {home.heroDescription}
               </p>
             </Reveal>
             <Reveal delay={240}>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/contact" withIcon>
-                  Start a project
+                <ButtonLink href={home.heroPrimaryCta.href} withIcon>
+                  {home.heroPrimaryCta.label}
                 </ButtonLink>
-                <ButtonLink href="/projects" variant="ghost" withIcon>
-                  View our work
+                <ButtonLink href={home.heroSecondaryCta.href} variant="ghost" withIcon>
+                  {home.heroSecondaryCta.label}
                 </ButtonLink>
               </div>
             </Reveal>
@@ -81,15 +69,15 @@ export default function HomePage() {
             <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] bg-ink">
               <div className="absolute inset-0 grid place-items-center p-8">
                 <img
-                  src="/images/tbm-logo.png"
+                  src={heroImage || "/placeholder.svg"}
                   alt=""
                   className="w-3/4 max-w-[280px] object-contain opacity-90 [filter:invert(1)] mix-blend-screen"
                 />
               </div>
               <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between rounded-2xl bg-paper/95 px-5 py-4 backdrop-blur">
                 <div>
-                  <p className="text-sm font-bold text-ink">The Backstage Marketing</p>
-                  <p className="text-xs text-muted">{site.tagline}</p>
+                  <p className="text-sm font-bold text-ink">{home.heroCardTitle}</p>
+                  <p className="text-xs text-muted">{home.heroCardTagline}</p>
                 </div>
                 <span className="grid h-9 w-9 flex-none place-items-center rounded-full bg-accent text-paper">
                   <ArrowUpRight className="h-4 w-4" />
@@ -118,9 +106,9 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <Reveal>
           <SectionHeading
-            eyebrow="What we do"
-            title="Full-stack creative, built for growth"
-            description="From the first sketch to the final campaign report, we cover every stage of your brand's journey."
+            eyebrow={home.servicesEyebrow}
+            title={home.servicesTitle}
+            description={home.servicesDescription}
           />
         </Reveal>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -152,10 +140,10 @@ export default function HomePage() {
             <div className="flex flex-col gap-4">
               <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-paper/50">
                 <span className="h-px w-6 bg-accent" aria-hidden="true" />
-                How we work
+                {home.processEyebrow}
               </span>
               <h2 className="max-w-2xl text-balance text-3xl font-black leading-[1.05] tracking-tight sm:text-4xl md:text-5xl">
-                A proven process from idea to impact
+                {home.processTitle}
               </h2>
             </div>
           </Reveal>
@@ -178,9 +166,9 @@ export default function HomePage() {
         <Reveal>
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <SectionHeading
-              eyebrow="Selected work"
-              title="Projects with a spotlight moment"
-              description="A look at the brands and campaigns we've helped step into the light."
+              eyebrow={home.workEyebrow}
+              title={home.workTitle}
+              description={home.workDescription}
             />
             <ButtonLink href="/projects" variant="ghost" withIcon className="shrink-0">
               All projects
@@ -232,13 +220,13 @@ export default function HomePage() {
       <section className="bg-paper-2/50">
         <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
-            <SectionHeading eyebrow="Kind words" title="Trusted by founders and marketing teams" align="center" />
+            <SectionHeading eyebrow={home.testimonialsEyebrow} title={home.testimonialsTitle} align="center" />
           </Reveal>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {testimonials.slice(0, 3).map((t, i) => (
               <Reveal key={t.name} delay={i * 70}>
                 <figure className="flex h-full flex-col gap-5 rounded-3xl border border-line bg-card p-7">
-                  <blockquote className="text-pretty text-base leading-relaxed text-ink">“{t.quote}”</blockquote>
+                  <blockquote className="text-pretty text-base leading-relaxed text-ink">{`“${t.quote}”`}</blockquote>
                   <figcaption className="mt-auto flex items-center gap-3">
                     <span className="grid h-11 w-11 flex-none place-items-center rounded-full bg-ink text-sm font-bold text-paper">
                       {t.name.charAt(0)}
@@ -265,10 +253,10 @@ export default function HomePage() {
             />
             <div className="relative flex flex-col items-start gap-6">
               <h2 className="max-w-2xl text-balance text-3xl font-black leading-[1.05] tracking-tight sm:text-5xl">
-                Ready to step into the spotlight?
+                {home.ctaTitle}
               </h2>
               <p className="max-w-xl text-pretty text-base leading-relaxed text-paper/70 sm:text-lg">
-                Tell us where you want to grow. We'll bring the strategy, creative and execution to get you there.
+                {home.ctaDescription}
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <ButtonLink href="/contact" withIcon>

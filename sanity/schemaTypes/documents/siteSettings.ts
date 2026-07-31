@@ -9,6 +9,7 @@ export const siteSettings = defineType({
   groups: [
     { name: "general", title: "General", default: true },
     { name: "contact", title: "Contact" },
+    { name: "navigation", title: "Navigation" },
     { name: "footer", title: "Footer" },
     { name: "seo", title: "Default SEO" },
   ],
@@ -79,6 +80,30 @@ export const siteSettings = defineType({
       type: "array",
       of: [{ type: "socialLink" }],
       group: "contact",
+    }),
+    defineField({
+      name: "navLinks",
+      title: "Navigation links",
+      type: "array",
+      group: "navigation",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "label", title: "Label", type: "string" },
+            { name: "href", title: "Href", type: "string" },
+          ],
+          preview: { select: { title: "label", subtitle: "href" } },
+        },
+      ],
+    }),
+    defineField({
+      name: "partners",
+      title: "Partners / clients",
+      type: "array",
+      of: [{ type: "string" }],
+      description: "Names shown in the partners strip.",
+      group: "general",
     }),
     defineField({
       name: "footerNote",
