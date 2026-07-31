@@ -158,10 +158,9 @@ export type Faq = {
 
 export type TeamMember = {
   name: string
-  position: string
+  role: string
   bio?: string
   linkedin?: string
-  email?: string
   photo?: SanityImageRef
 }
 
@@ -232,6 +231,7 @@ export type AboutPage = {
   valuesEyebrow: string
   valuesTitle: string
   values: AboutValue[]
+  team: TeamMember[]
   ctaTitle: string
   ctaDescription: string
   seo?: Seo

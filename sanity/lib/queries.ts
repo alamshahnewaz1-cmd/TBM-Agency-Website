@@ -94,15 +94,38 @@ export const aboutPageQuery = groq`
     heroEyebrow,
     heroTitle,
     heroDescription,
+
     storyEyebrow,
     storyTitle,
     storyParagraphs,
-    milestones[]{ year, copy },
+
+    milestones[]{
+      year,
+      copy
+    },
+
     valuesEyebrow,
     valuesTitle,
-    values[]{ icon, title, copy },
+
+    values[]{
+      icon,
+      title,
+      copy
+    },
+
+    team[]{
+      name,
+      role,
+      bio,
+      linkedin,
+      "photo": photo{
+        ${imageFields}
+      }.image
+    },
+
     ctaTitle,
     ctaDescription,
+
     ${seoFields}
   }
 `
