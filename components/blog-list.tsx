@@ -4,7 +4,8 @@ import { useState } from "react"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Reveal } from "@/components/reveal"
-import { formatDate, type BlogPost } from "@/lib/blog"
+import { formatDate } from "@/lib/blog"
+import type { BlogPost } from "@/lib/types"
 
 export function BlogList({
   posts,

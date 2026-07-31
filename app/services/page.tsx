@@ -5,8 +5,7 @@ import { ButtonLink } from "@/components/button-link"
 import { Reveal } from "@/components/reveal"
 import { Eyebrow, SectionHeading } from "@/components/section-heading"
 import { PageHero } from "@/components/page-hero"
-import { services } from "@/lib/services"
-import { site } from "@/lib/site"
+import { getServices } from "@/lib/data/services"
 
 export const metadata: Metadata = {
   title: "Services",
@@ -15,7 +14,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/services" },
 }
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const services = await getServices()
+
   return (
     <>
       <PageHero

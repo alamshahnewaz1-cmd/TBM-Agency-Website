@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Reveal } from "@/components/reveal"
-import type { Project } from "@/lib/projects"
+import type { Project } from "@/lib/types"
 
 export function ProjectsGrid({
   projects,

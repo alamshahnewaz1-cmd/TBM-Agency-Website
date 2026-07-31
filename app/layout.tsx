@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { getSiteSettings } from "@/lib/data/site"
 import "./globals.css"
 
 const inter = Inter({
@@ -73,11 +74,12 @@ export const viewport: Viewport = {
   themeColor: "#09090b",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const settings = await getSiteSettings()
   return (
     <html lang="en" className={`${inter.variable} bg-background`}>
       <body className="font-sans antialiased">
@@ -104,9 +106,9 @@ export default function RootLayout({
           }}
         />
         <div className="noise" aria-hidden="true" />
-        <SiteHeader />
+        <SiteHeader navLinks={settings.navLinks} />
         <main>{children}</main>
-        <SiteFooter />
+        <SiteFooter settings={settings} />
       </body>
     </html>
   )

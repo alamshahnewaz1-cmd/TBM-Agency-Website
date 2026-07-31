@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { PageHero } from "@/components/page-hero"
 import { BlogList } from "@/components/blog-list"
-import { blogPosts, blogCategories } from "@/lib/blog"
+import { getPosts, getBlogCategories } from "@/lib/data/blog"
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -10,7 +10,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/blog" },
 }
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const [blogPosts, blogCategories] = await Promise.all([getPosts(), getBlogCategories()])
   return (
     <>
       <PageHero

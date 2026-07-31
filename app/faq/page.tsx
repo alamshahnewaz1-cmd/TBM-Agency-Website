@@ -3,7 +3,7 @@ import { ButtonLink } from "@/components/button-link"
 import { Reveal } from "@/components/reveal"
 import { PageHero } from "@/components/page-hero"
 import { FaqAccordion } from "@/components/faq-accordion"
-import { faqs } from "@/lib/faq"
+import { getFaqs } from "@/lib/data/faq"
 
 export const metadata: Metadata = {
   title: "FAQ",
@@ -12,17 +12,17 @@ export const metadata: Metadata = {
   alternates: { canonical: "/faq" },
 }
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqs.map((f) => ({
-    "@type": "Question",
-    name: f.question,
-    acceptedAnswer: { "@type": "Answer", text: f.answer },
-  })),
-}
-
-export default function FaqPage() {
+export default async function FaqPage() {
+  const faqs = await getFaqs()
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer },
+    })),
+  }
   return (
     <>
       <script

@@ -4,16 +4,18 @@ import { notFound } from "next/navigation"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { ButtonLink } from "@/components/button-link"
 import { Reveal } from "@/components/reveal"
+import { PortableText } from "@/components/portable-text"
 import {
-  blogPosts,
   getPost,
+  getPostSlugs,
   getRelatedPosts,
   formatDate,
   type BlogBlock,
-} from "@/lib/blog"
+} from "@/lib/data/blog"
 
-export function generateStaticParams() {
-  return blogPosts.map((p) => ({ slug: p.slug }))
+export async function generateStaticParams() {
+  const slugs = await getPostSlugs()
+  return slugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({
@@ -22,7 +24,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const post = getPost(slug)
+  const post = await getPost(slug)
   if (!post) return { title: "Article not found" }
   return {
     title: post.title,
@@ -71,10 +73,10 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const post = getPost(slug)
+  const post = await getPost(slug)
   if (!post) notFound()
 
-  const related = getRelatedPosts(slug, 2)
+  const related = await getRelatedPosts(slug, 2)
 
   return (
     <>
@@ -120,9 +122,11 @@ export default async function BlogPostPage({
 
         {/* Body */}
         <div className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-16">
-          {post.body.map((block, i) => (
-            <Block key={i} block={block} />
-          ))}
+          {post.portableBody && post.portableBody.length > 0 ? (
+            <PortableText value={post.portableBody} />
+          ) : (
+            post.body?.map((block, i) => <Block key={i} block={block} />)
+          )}
         </div>
       </article>
 

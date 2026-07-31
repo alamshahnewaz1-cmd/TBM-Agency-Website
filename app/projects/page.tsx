@@ -4,7 +4,7 @@ import { Reveal } from "@/components/reveal"
 import { SectionHeading } from "@/components/section-heading"
 import { PageHero } from "@/components/page-hero"
 import { ProjectsGrid } from "@/components/projects-grid"
-import { projects, projectCategories } from "@/lib/projects"
+import { getProjects, projectCategories } from "@/lib/data/projects"
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -13,7 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/projects" },
 }
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const projects = await getProjects()
+
   return (
     <>
       <PageHero

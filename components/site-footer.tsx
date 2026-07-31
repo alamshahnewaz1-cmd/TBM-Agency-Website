@@ -1,10 +1,12 @@
 import Link from "next/link"
 import { ArrowUpRight, Mail } from "lucide-react"
 import { Logo } from "@/components/logo"
-import { navLinks, site } from "@/lib/site"
+import type { SiteSettings } from "@/lib/types"
 
-export function SiteFooter() {
+export function SiteFooter({ settings }: { settings: SiteSettings }) {
   const year = new Date().getFullYear()
+  const { navLinks, footerNote } = settings
+  const site = settings
 
   return (
     <footer className="border-t border-line bg-ink text-paper">
@@ -13,7 +15,8 @@ export function SiteFooter() {
           <div className="flex flex-col gap-5">
             <Logo variant="light" />
             <p className="max-w-sm text-pretty text-sm leading-relaxed text-paper/70">
-              {site.tagline} We build brands and campaigns behind the scenes so your business can own the spotlight.
+              {footerNote ||
+                `${site.tagline} We build brands and campaigns behind the scenes so your business can own the spotlight.`}
             </p>
             <a
               href={`mailto:${site.email}`}

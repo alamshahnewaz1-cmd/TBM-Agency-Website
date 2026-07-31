@@ -1,15 +1,17 @@
 import createImageUrlBuilder from "@sanity/image-url"
-import type { Image } from "sanity"
 
 import { dataset, projectId } from "@/sanity/env"
 
 const builder = createImageUrlBuilder({ projectId: projectId || "placeholder", dataset })
 
+/** The image reference shape accepted by the URL builder. */
+type SanityImageSource = Parameters<typeof builder.image>[0]
+
 /**
  * Build an optimised image URL from a Sanity image reference.
  * Returns an empty string when passed a falsy value so callers can fall back.
  */
-export function urlForImage(source: Image | undefined | null) {
+export function urlForImage(source: SanityImageSource | undefined | null) {
   if (!source || !(source as { asset?: unknown }).asset) return undefined
   return builder.image(source).auto("format").fit("max")
 }
@@ -18,7 +20,7 @@ export function urlForImage(source: Image | undefined | null) {
  * Convenience helper that returns a plain string URL (or a fallback path).
  */
 export function imageUrl(
-  source: Image | undefined | null,
+  source: SanityImageSource | undefined | null,
   fallback = "/placeholder.svg",
 ): string {
   const url = urlForImage(source)

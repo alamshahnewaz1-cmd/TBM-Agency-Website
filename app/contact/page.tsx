@@ -3,7 +3,7 @@ import { Mail, Clock, MessageSquare } from "lucide-react"
 import { Reveal } from "@/components/reveal"
 import { PageHero } from "@/components/page-hero"
 import { ContactForm } from "@/components/contact-form"
-import { site } from "@/lib/site"
+import { getSiteSettings } from "@/lib/data/site"
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
 }
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const site = await getSiteSettings()
   return (
     <>
       <PageHero

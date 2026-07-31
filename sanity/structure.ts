@@ -49,4 +49,4 @@ export const structure: StructureResolver = (S) =>
     ])
 
 /** Schema types that should not appear in the default "create new" lists. */
-export const SINGLETON_TYPES = new Set(SINGLETONS.map((s) => s.type))
+export const SINGLETON_TYPES = new Set<string>(SINGLETONS.map((s) => s.type))

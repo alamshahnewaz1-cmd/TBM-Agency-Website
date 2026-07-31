@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Plus } from "lucide-react"
-import type { Faq } from "@/lib/faq"
+import type { Faq } from "@/lib/types"
 
 export function FaqAccordion({ items }: { items: Faq[] }) {
   const [open, setOpen] = useState<number | null>(0)

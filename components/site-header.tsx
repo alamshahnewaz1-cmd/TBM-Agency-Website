@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Menu, X, ArrowUpRight } from "lucide-react"
 import { Logo } from "@/components/logo"
-import { navLinks } from "@/lib/site"
+import type { NavLink } from "@/lib/types"
 
-export function SiteHeader() {
+export function SiteHeader({ navLinks }: { navLinks: NavLink[] }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)

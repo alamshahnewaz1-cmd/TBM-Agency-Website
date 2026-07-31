@@ -5,10 +5,11 @@ import { ArrowLeft, ArrowUpRight, Check } from "lucide-react"
 import { ButtonLink } from "@/components/button-link"
 import { Reveal } from "@/components/reveal"
 import { Eyebrow } from "@/components/section-heading"
-import { projects, getProject } from "@/lib/projects"
+import { getProject, getProjectSlugs } from "@/lib/data/projects"
 
-export function generateStaticParams() {
-  return projects.map((p) => ({ slug: p.slug }))
+export async function generateStaticParams() {
+  const slugs = await getProjectSlugs()
+  return slugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({
@@ -17,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const project = getProject(slug)
+  const project = await getProject(slug)
   if (!project) return { title: "Project not found" }
   return {
     title: `${project.client} — Case Study`,
@@ -37,7 +38,7 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const project = getProject(slug)
+  const project = await getProject(slug)
   if (!project) notFound()
 
   return (
