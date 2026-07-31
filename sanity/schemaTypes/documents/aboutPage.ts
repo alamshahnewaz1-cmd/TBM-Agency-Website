@@ -12,16 +12,43 @@ export const aboutPage = defineType({
     { name: "hero", title: "Hero", default: true },
     { name: "story", title: "Story" },
     { name: "values", title: "Values" },
+    { name: "team", title: "Team" },
     { name: "cta", title: "CTA" },
     { name: "seo", title: "SEO" },
   ],
   fields: [
-    defineField({ name: "heroEyebrow", title: "Hero eyebrow", type: "string", group: "hero" }),
-    defineField({ name: "heroTitle", title: "Hero title", type: "string", group: "hero" }),
-    defineField({ name: "heroDescription", title: "Hero description", type: "text", rows: 3, group: "hero" }),
+    defineField({
+      name: "heroEyebrow",
+      title: "Hero eyebrow",
+      type: "string",
+      group: "hero",
+    }),
+    defineField({
+      name: "heroTitle",
+      title: "Hero title",
+      type: "string",
+      group: "hero",
+    }),
+    defineField({
+      name: "heroDescription",
+      title: "Hero description",
+      type: "text",
+      rows: 3,
+      group: "hero",
+    }),
 
-    defineField({ name: "storyEyebrow", title: "Story eyebrow", type: "string", group: "story" }),
-    defineField({ name: "storyTitle", title: "Story title", type: "string", group: "story" }),
+    defineField({
+      name: "storyEyebrow",
+      title: "Story eyebrow",
+      type: "string",
+      group: "story",
+    }),
+    defineField({
+      name: "storyTitle",
+      title: "Story title",
+      type: "string",
+      group: "story",
+    }),
     defineField({
       name: "storyParagraphs",
       title: "Story paragraphs",
@@ -38,16 +65,40 @@ export const aboutPage = defineType({
         {
           type: "object",
           fields: [
-            { name: "year", title: "Label", type: "string" },
-            { name: "copy", title: "Copy", type: "text", rows: 2 },
+            {
+              name: "year",
+              title: "Label",
+              type: "string",
+            },
+            {
+              name: "copy",
+              title: "Copy",
+              type: "text",
+              rows: 2,
+            },
           ],
-          preview: { select: { title: "year", subtitle: "copy" } },
+          preview: {
+            select: {
+              title: "year",
+              subtitle: "copy",
+            },
+          },
         },
       ],
     }),
 
-    defineField({ name: "valuesEyebrow", title: "Values eyebrow", type: "string", group: "values" }),
-    defineField({ name: "valuesTitle", title: "Values title", type: "string", group: "values" }),
+    defineField({
+      name: "valuesEyebrow",
+      title: "Values eyebrow",
+      type: "string",
+      group: "values",
+    }),
+    defineField({
+      name: "valuesTitle",
+      title: "Values title",
+      type: "string",
+      group: "values",
+    }),
     defineField({
       name: "values",
       title: "Values",
@@ -61,22 +112,106 @@ export const aboutPage = defineType({
               name: "icon",
               title: "Icon",
               type: "string",
-              options: { list: ICON_OPTIONS },
+              options: {
+                list: ICON_OPTIONS,
+              },
             },
-            { name: "title", title: "Title", type: "string" },
-            { name: "copy", title: "Copy", type: "text", rows: 2 },
+            {
+              name: "title",
+              title: "Title",
+              type: "string",
+            },
+            {
+              name: "copy",
+              title: "Copy",
+              type: "text",
+              rows: 2,
+            },
           ],
-          preview: { select: { title: "title", subtitle: "copy" } },
+          preview: {
+            select: {
+              title: "title",
+              subtitle: "copy",
+            },
+          },
         },
       ],
     }),
 
-    defineField({ name: "ctaTitle", title: "CTA title", type: "string", group: "cta" }),
-    defineField({ name: "ctaDescription", title: "CTA description", type: "text", rows: 2, group: "cta" }),
+    defineField({
+      name: "team",
+      title: "Team Members",
+      type: "array",
+      group: "team",
+      of: [
+        {
+          type: "object",
+          fields: [
+            {
+              name: "photo",
+              title: "Photo",
+              type: "image",
+              options: {
+                hotspot: true,
+              },
+            },
+            {
+              name: "name",
+              title: "Name",
+              type: "string",
+            },
+            {
+              name: "role",
+              title: "Role",
+              type: "string",
+            },
+            {
+              name: "bio",
+              title: "Bio",
+              type: "text",
+              rows: 3,
+            },
+            {
+              name: "linkedin",
+              title: "LinkedIn URL",
+              type: "url",
+            },
+          ],
+          preview: {
+            select: {
+              title: "name",
+              subtitle: "role",
+              media: "photo",
+            },
+          },
+        },
+      ],
+    }),
 
-    defineField({ name: "seo", title: "SEO", type: "seo", group: "seo" }),
+    defineField({
+      name: "ctaTitle",
+      title: "CTA title",
+      type: "string",
+      group: "cta",
+    }),
+    defineField({
+      name: "ctaDescription",
+      title: "CTA description",
+      type: "text",
+      rows: 2,
+      group: "cta",
+    }),
+
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "seo",
+      group: "seo",
+    }),
   ],
   preview: {
-    prepare: () => ({ title: "About Page" }),
+    prepare: () => ({
+      title: "About Page",
+    }),
   },
 })
