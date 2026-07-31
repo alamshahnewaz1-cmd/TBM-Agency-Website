@@ -4,18 +4,25 @@ import { client } from "@/sanity/lib/client"
 import { isSanityConfigured } from "@/sanity/env"
 
 /**
- * Default revalidation window (seconds). Content also revalidates on demand
- * via the `/api/revalidate` webhook using the tags passed here.
+ * Default revalidation window in seconds.
+ *
+ * Sanity content will automatically refresh at most every 60 seconds.
+ * Cache tags are still included so webhook-based revalidation can be added
+ * later without changing the data-fetching code.
  */
 const DEFAULT_REVALIDATE = 60
 
 type FetchParams = Record<string, unknown>
 
 /**
- * Thin, typed wrapper around the Sanity client that:
- *  - short-circuits to `null` when Sanity is not configured (so callers can
- *    fall back to bundled content and the site never breaks), and
- *  - wires up Next.js ISR caching with tag-based on-demand revalidation.
+ * Typed wrapper around the Sanity client.
+ *
+ * It:
+ * - returns null when Sanity is not configured
+ * - allows pages to use bundled fallback content
+ * - caches published Sanity content
+ * - automatically checks for updated content every 60 seconds
+ * - supports cache tags for future on-demand revalidation
  */
 export async function sanityFetch<T>({
   query,
@@ -33,12 +40,16 @@ export async function sanityFetch<T>({
   try {
     return await client.fetch<T>(query, params, {
       next: {
-        revalidate: tags.length ? false : revalidate,
+        revalidate,
         tags,
       },
     })
   } catch (error) {
-    console.log("[v0] Sanity fetch failed, falling back to bundled content:", error)
+    console.error(
+      "[Sanity] Fetch failed. Falling back to bundled content:",
+      error,
+    )
+
     return null
   }
 }
