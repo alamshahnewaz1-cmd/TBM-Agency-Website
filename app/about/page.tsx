@@ -9,13 +9,15 @@ import { resolveIcon } from "@/lib/icon-map"
 export const metadata: Metadata = {
   title: "About",
   description:
-    "The Backstage Marketing is a creative growth agency doing the work behind the scenes so your brand can own the spotlight. Meet the team and our philosophy.",
+    "The Backstage Marketing is a creative growth agency doing the work behind the scenes so your brand can take center stage.",
   alternates: { canonical: "/about" },
 }
 
 export default async function AboutPage() {
   const about = await getAboutPage()
+
   const { values, milestones } = about
+
   return (
     <>
       <PageHero
@@ -89,27 +91,8 @@ export default async function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-        <Reveal>
-          <div className="relative overflow-hidden rounded-[32px] bg-ink px-7 py-14 text-paper sm:px-14 sm:py-20">
-            <div
-              className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-accent/30 blur-3xl"
-              aria-hidden="true"
-            />
-            <div className="relative flex flex-col items-start gap-6">
-              <h2 className="max-w-2xl text-balance text-3xl font-black leading-[1.05] tracking-tight sm:text-5xl">
-                {about.ctaTitle}
-              </h2>
-              <p className="max-w-xl text-pretty leading-relaxed text-paper/70 sm:text-lg">
-                {about.ctaDescription}
-              </p>
-              <ButtonLink href="/contact" withIcon>
-                Start a conversation
-              </ButtonLink>
-            </div>
-          </div>
-        </Reveal>
-      </section>
+     
+
     </>
   )
 }
