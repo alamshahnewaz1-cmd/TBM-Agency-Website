@@ -9,17 +9,24 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@portabletext/react": "^7.0.1",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^6.8.0",
+    "lucide-react": "latest",
     "next": "latest",
+    "next-sanity": "^13.2.3",
     "react": "latest",
     "react-dom": "latest",
-    "lucide-react": "latest"
+    "resend": "^6.18.1",
+    "sanity": "^6.8.0",
+    "styled-components": "^6.4.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "latest",
-    "tailwindcss": "latest",
-    "typescript": "^5.9.2",
     "@types/node": "latest",
     "@types/react": "latest",
-    "@types/react-dom": "latest"
+    "@types/react-dom": "latest",
+    "tailwindcss": "latest",
+    "typescript": "^5.9.2"
   }
 }
