@@ -11,14 +11,21 @@ import { groq } from "next-sanity"
  * ------------------------------------------------------------------ */
 
 const imageFields = /* groq */ `
-  "image": { "asset": asset, "hotspot": hotspot, "crop": crop, "alt": alt }
+  "image": {
+    "asset": asset,
+    "hotspot": hotspot,
+    "crop": crop,
+    "alt": alt
+  }
 `
 
 const seoFields = /* groq */ `
   seo {
     metaTitle,
     metaDescription,
-    "ogImage": ogImage{ ${imageFields} }.image,
+    "ogImage": ogImage{
+      ${imageFields}
+    }.image,
     noIndex
   }
 `
@@ -37,15 +44,32 @@ export const siteSettingsQuery = groq`
     phone,
     address,
     url,
-    "logo": logo{ ${imageFields} }.image,
-    socials[]{ label, href },
-    navLinks[]{ label, href },
+
+    "logo": logo{
+      ${imageFields}
+    }.image,
+
+    socials[]{
+      label,
+      href
+    },
+
+    navLinks[]{
+      label,
+      href
+    },
+
     partners,
     footerNote,
+
     "seo": defaultSeo {
       metaTitle,
       metaDescription,
-      "ogImage": ogImage{ ${imageFields} }.image,
+
+      "ogImage": ogImage{
+        ${imageFields}
+      }.image,
+
       noIndex
     }
   }
@@ -61,26 +85,54 @@ export const homepageQuery = groq`
     heroTitleLead,
     heroTitleHighlight,
     heroDescription,
-    heroPrimaryCta{ label, href },
-    heroSecondaryCta{ label, href },
-    "heroImage": heroImage{ ${imageFields} }.image,
+
+    heroPrimaryCta{
+      label,
+      href
+    },
+
+    heroSecondaryCta{
+      label,
+      href
+    },
+
+    "heroImage": heroImage{
+      ${imageFields}
+    }.image,
+
     heroCardTitle,
     heroCardTagline,
-    stats[]{ value, label },
+
+    stats[]{
+      value,
+      label
+    },
+
     marqueeItems,
+
     servicesEyebrow,
     servicesTitle,
     servicesDescription,
+
     processEyebrow,
     processTitle,
-    processSteps[]{ step, title, copy },
+
+    processSteps[]{
+      step,
+      title,
+      copy
+    },
+
     workEyebrow,
     workTitle,
     workDescription,
+
     testimonialsEyebrow,
     testimonialsTitle,
+
     ctaTitle,
     ctaDescription,
+
     ${seoFields}
   }
 `
@@ -118,6 +170,7 @@ export const aboutPageQuery = groq`
       role,
       bio,
       linkedin,
+
       "photo": photo{
         ${imageFields}
       }.image
@@ -135,7 +188,11 @@ export const aboutPageQuery = groq`
  * ------------------------------------------------------------------ */
 
 export const servicesQuery = groq`
-  *[_type == "service"] | order(displayOrder asc, title asc){
+  *[_type == "service"]
+  | order(
+      displayOrder asc,
+      title asc
+    ){
     "slug": slug.current,
     title,
     tagline,
@@ -145,7 +202,11 @@ export const servicesQuery = groq`
     deliverables,
     forWho,
     outcomes,
-    "coverImage": coverImage{ ${imageFields} }.image,
+
+    "coverImage": coverImage{
+      ${imageFields}
+    }.image,
+
     featured,
     displayOrder
   }
@@ -157,39 +218,75 @@ export const servicesQuery = groq`
 
 const projectFields = /* groq */ `
   "slug": slug.current,
+
   client,
   title,
   type,
-  category,
+
+  "category": coalesce(
+    category->title,
+    "Uncategorised"
+  ),
+
+  industry,
   services,
+  tags,
   status,
   year,
+  completionDate,
   summary,
   featured,
+  order,
   website,
-  "cover": coverImage{ ${imageFields} }.image,
+
+  "cover": cover{
+    ${imageFields}
+  }.image,
+
   overview,
   challenge,
   strategy,
-  "gallery": gallery[]{ ${imageFields} }.image,
-  results[]{ label, value },
+
+  "gallery": gallery[]{
+    ${imageFields}
+  }.image,
+
+  results[]{
+    label,
+    value
+  },
+
   ${seoFields}
 `
 
 export const projectsQuery = groq`
-  *[_type == "project"] | order(featured desc, year desc, _createdAt desc){
+  *[_type == "project"]
+  | order(
+      featured desc,
+      coalesce(order, 9999) asc,
+      year desc,
+      _createdAt desc
+    ){
     ${projectFields}
   }
 `
 
 export const projectBySlugQuery = groq`
-  *[_type == "project" && slug.current == $slug][0]{
+  *[
+    _type == "project" &&
+    slug.current == $slug
+  ][0]{
     ${projectFields}
   }
 `
 
 export const projectSlugsQuery = groq`
-  *[_type == "project" && defined(slug.current)]{ "slug": slug.current }
+  *[
+    _type == "project" &&
+    defined(slug.current)
+  ]{
+    "slug": slug.current
+  }
 `
 
 /* ------------------------------------------------------------------ *
@@ -200,22 +297,39 @@ const postFields = /* groq */ `
   "slug": slug.current,
   title,
   excerpt,
-  "category": coalesce(category->title, "Uncategorised"),
-  "author": coalesce(author->name, "The Backstage Marketing"),
+
+  "category": coalesce(
+    category->title,
+    "Uncategorised"
+  ),
+
+  "author": coalesce(
+    author->name,
+    "The Backstage Marketing"
+  ),
+
   "date": publishDate,
   readingTime,
-  "cover": coverImage{ ${imageFields} }.image,
+
+  "cover": coverImage{
+    ${imageFields}
+  }.image,
+
   featured
 `
 
 export const postsQuery = groq`
-  *[_type == "post"] | order(publishDate desc){
+  *[_type == "post"]
+  | order(publishDate desc){
     ${postFields}
   }
 `
 
 export const postBySlugQuery = groq`
-  *[_type == "post" && slug.current == $slug][0]{
+  *[
+    _type == "post" &&
+    slug.current == $slug
+  ][0]{
     ${postFields},
     body,
     ${seoFields}
@@ -223,20 +337,35 @@ export const postBySlugQuery = groq`
 `
 
 export const postSlugsQuery = groq`
-  *[_type == "post" && defined(slug.current)]{ "slug": slug.current }
+  *[
+    _type == "post" &&
+    defined(slug.current)
+  ]{
+    "slug": slug.current
+  }
 `
 
 export const relatedPostsQuery = groq`
-  *[_type == "post" && slug.current != $slug] | order(
-    select(coalesce(category->title, "") == $category => 0, 1) asc,
-    publishDate desc
-  )[0...$limit]{
+  *[
+    _type == "post" &&
+    slug.current != $slug
+  ]
+  | order(
+      select(
+        coalesce(category->title, "") == $category => 0,
+        1
+      ) asc,
+      publishDate desc
+    )[0...$limit]{
     ${postFields}
   }
 `
 
 export const blogCategoriesQuery = groq`
-  *[_type == "category"] | order(title asc){ "title": title }
+  *[_type == "category"]
+  | order(title asc){
+    "title": title
+  }
 `
 
 /* ------------------------------------------------------------------ *
@@ -244,14 +373,22 @@ export const blogCategoriesQuery = groq`
  * ------------------------------------------------------------------ */
 
 export const testimonialsQuery = groq`
-  *[_type == "testimonial"] | order(featured desc, displayOrder asc, _createdAt asc){
+  *[_type == "testimonial"]
+  | order(
+      featured desc,
+      displayOrder asc,
+      _createdAt asc
+    ){
     quote,
     name,
     role,
     company,
     rating,
     featured,
-    "photo": photo{ ${imageFields} }.image
+
+    "photo": photo{
+      ${imageFields}
+    }.image
   }
 `
 
@@ -260,7 +397,11 @@ export const testimonialsQuery = groq`
  * ------------------------------------------------------------------ */
 
 export const faqsQuery = groq`
-  *[_type == "faq"] | order(displayOrder asc, _createdAt asc){
+  *[_type == "faq"]
+  | order(
+      displayOrder asc,
+      _createdAt asc
+    ){
     question,
     answer,
     category
@@ -272,13 +413,21 @@ export const faqsQuery = groq`
  * ------------------------------------------------------------------ */
 
 export const teamQuery = groq`
-  *[_type == "teamMember"] | order(displayOrder asc, name asc){
+  *[_type == "teamMember"]
+  | order(
+      displayOrder asc,
+      name asc
+    ){
     name,
     position,
     bio,
     linkedin,
     email,
-    "photo": photo{ ${imageFields} }.image,
+
+    "photo": photo{
+      ${imageFields}
+    }.image,
+
     displayOrder
   }
 `
@@ -288,20 +437,29 @@ export const teamQuery = groq`
  * ------------------------------------------------------------------ */
 
 export const pricingQuery = groq`
-  *[_type == "pricingPlan"] | order(displayOrder asc, _createdAt asc){
+  *[_type == "pricingPlan"]
+  | order(
+      displayOrder asc,
+      _createdAt asc
+    ){
     name,
     pricePrefix,
     startingPrice,
     description,
     features,
-    cta{ label, href },
+
+    cta{
+      label,
+      href
+    },
+
     featured,
     displayOrder
   }
 `
 
 /* ------------------------------------------------------------------ *
- * Partners (from testimonials lib originally) — stored on siteSettings
+ * Partners — stored on site settings
  * ------------------------------------------------------------------ */
 
 export const partnersQuery = groq`
