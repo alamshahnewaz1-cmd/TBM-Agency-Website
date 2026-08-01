@@ -8,117 +8,231 @@ export const service = defineType({
   title: "Service",
   type: "document",
   icon: LayoutGrid,
+
   groups: [
-    { name: "content", title: "Content", default: true },
-    { name: "detail", title: "Details" },
-    { name: "settings", title: "Settings" },
+    {
+      name: "content",
+      title: "Content",
+      default: true,
+    },
+    {
+      name: "details",
+      title: "Details",
+    },
+    {
+      name: "settings",
+      title: "Settings",
+    },
+    {
+      name: "seo",
+      title: "SEO",
+    },
   ],
+
   fields: [
     defineField({
       name: "title",
-      title: "Name",
+      title: "Service name",
       type: "string",
       group: "content",
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "slug",
       title: "Slug",
       type: "slug",
       group: "content",
-      options: { source: "title", maxLength: 96 },
+      options: {
+        source: "title",
+        maxLength: 96,
+      },
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "icon",
       title: "Icon",
       type: "string",
       group: "content",
-      options: { list: ICON_OPTIONS },
-      description: "Icon shown in cards and section headers.",
+      options: {
+        list: ICON_OPTIONS,
+      },
+      description:
+        "Choose the icon displayed on the homepage and Services page.",
+      validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "tagline",
       title: "Tagline",
       type: "string",
       group: "content",
-      description: "Short phrase, e.g. “The thinking before the making.”",
+      description:
+        'A short phrase such as “The thinking before the making.”',
+      validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "summary",
       title: "Short description",
       type: "text",
-      rows: 2,
+      rows: 3,
       group: "content",
-      description: "Used on cards and the homepage.",
+      description:
+        "Used on the homepage and compact service cards.",
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "description",
       title: "Full description",
       type: "text",
-      rows: 4,
+      rows: 5,
       group: "content",
+      description:
+        "The main description shown in the expanded Services section.",
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "coverImage",
       title: "Cover image",
       type: "image",
       group: "content",
-      options: { hotspot: true },
-      description: "Optional image for the service.",
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alternative text",
+          type: "string",
+          description:
+            "Briefly describe the image for accessibility and search engines.",
+        }),
+      ],
+      description:
+        "Optional artwork or photograph for this service.",
     }),
+
     defineField({
       name: "forWho",
       title: "Best for",
       type: "text",
-      rows: 2,
-      group: "detail",
+      rows: 3,
+      group: "details",
+      description:
+        "Describe the type of client or situation this service is designed for.",
+      validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "deliverables",
-      title: "Deliverables (What you get)",
+      title: "What you get",
       type: "array",
-      of: [{ type: "string" }],
-      group: "detail",
+      group: "details",
+      of: [
+        {
+          type: "string",
+        },
+      ],
+      description:
+        "List the main deliverables included with this service.",
+      validation: (rule) => rule.min(1),
     }),
+
     defineField({
       name: "outcomes",
-      title: "Key features / Outcomes",
+      title: "Expected outcomes",
       type: "array",
-      of: [{ type: "string" }],
-      group: "detail",
+      group: "details",
+      of: [
+        {
+          type: "string",
+        },
+      ],
+      description:
+        "List the main benefits or business outcomes.",
+      validation: (rule) => rule.min(1),
     }),
+
     defineField({
-      name: "order",
+      name: "displayOrder",
       title: "Display order",
       type: "number",
       group: "settings",
+      description:
+        "Lower numbers appear first. Use 1, 2, 3 and so on.",
       initialValue: 0,
+      validation: (rule) => rule.required().integer().min(0),
     }),
+
     defineField({
       name: "featured",
       title: "Featured",
       type: "boolean",
       group: "settings",
+      description:
+        "Mark this service as featured for future highlighted sections.",
       initialValue: false,
     }),
+
     defineField({
       name: "seo",
       title: "SEO",
       type: "seo",
-      group: "settings",
+      group: "seo",
     }),
   ],
+
   orderings: [
     {
       title: "Display order",
-      name: "orderAsc",
-      by: [{ field: "order", direction: "asc" }],
+      name: "displayOrderAsc",
+      by: [
+        {
+          field: "displayOrder",
+          direction: "asc",
+        },
+      ],
+    },
+    {
+      title: "Service name",
+      name: "titleAsc",
+      by: [
+        {
+          field: "title",
+          direction: "asc",
+        },
+      ],
     },
   ],
+
   preview: {
-    select: { title: "title", subtitle: "tagline" },
+    select: {
+      title: "title",
+      subtitle: "tagline",
+      media: "coverImage",
+      displayOrder: "displayOrder",
+    },
+
+    prepare({
+      title,
+      subtitle,
+      media,
+      displayOrder,
+    }) {
+      const orderPrefix =
+        typeof displayOrder === "number"
+          ? `${displayOrder}. `
+          : ""
+
+      return {
+        title: title || "Untitled service",
+        subtitle: `${orderPrefix}${subtitle || "No tagline"}`,
+        media,
+      }
+    },
   },
 })
