@@ -3,6 +3,121 @@ import { defineField, defineType } from "sanity"
 
 import { ICON_OPTIONS } from "@/sanity/lib/iconOptions"
 
+const inquiryField = {
+  type: "object",
+  name: "inquiryField",
+  title: "Inquiry field",
+
+  fields: [
+    defineField({
+      name: "label",
+      title: "Field label",
+      type: "string",
+      validation: (rule) => rule.required(),
+    }),
+
+    defineField({
+      name: "name",
+      title: "Field key",
+      type: "string",
+      description:
+        'Internal key used when saving the inquiry. Example: "websiteUrl", "productCount", "launchDate".',
+      validation: (rule) =>
+        rule
+          .required()
+          .regex(
+            /^[a-zA-Z][a-zA-Z0-9_]*$/,
+            "Use letters, numbers and underscores only. Start with a letter.",
+          ),
+    }),
+
+    defineField({
+      name: "fieldType",
+      title: "Field type",
+      type: "string",
+      options: {
+        list: [
+          { title: "Short text", value: "text" },
+          { title: "Email", value: "email" },
+          { title: "Phone", value: "tel" },
+          { title: "Website / URL", value: "url" },
+          { title: "Number", value: "number" },
+          { title: "Long text", value: "textarea" },
+          { title: "Dropdown", value: "select" },
+          { title: "Yes / No", value: "boolean" },
+        ],
+      },
+      initialValue: "text",
+      validation: (rule) => rule.required(),
+    }),
+
+    defineField({
+      name: "placeholder",
+      title: "Placeholder",
+      type: "string",
+      hidden: ({ parent }) =>
+        parent?.fieldType === "select" ||
+        parent?.fieldType === "boolean",
+    }),
+
+    defineField({
+      name: "required",
+      title: "Required",
+      type: "boolean",
+      initialValue: false,
+    }),
+
+    defineField({
+      name: "options",
+      title: "Dropdown options",
+      type: "array",
+      of: [{ type: "string" }],
+      hidden: ({ parent }) => parent?.fieldType !== "select",
+      description:
+        "Used only for dropdown fields. Add each option separately.",
+    }),
+
+    defineField({
+      name: "helpText",
+      title: "Help text",
+      type: "string",
+      description:
+        "Optional explanation displayed underneath the field.",
+    }),
+
+    defineField({
+      name: "displayOrder",
+      title: "Display order",
+      type: "number",
+      initialValue: 0,
+      validation: (rule) => rule.integer().min(0),
+    }),
+  ],
+
+  preview: {
+    select: {
+      title: "label",
+      fieldType: "fieldType",
+      required: "required",
+    },
+
+    prepare({
+      title,
+      fieldType,
+      required,
+    }: {
+      title?: string
+      fieldType?: string
+      required?: boolean
+    }) {
+      return {
+        title: title || "Untitled field",
+        subtitle: `${fieldType || "text"}${required ? " · Required" : ""}`,
+      }
+    },
+  },
+}
+
 export const service = defineType({
   name: "service",
   title: "Service",
@@ -42,6 +157,10 @@ export const service = defineType({
   ],
 
   fields: [
+    /* -------------------------------------------------------------- */
+    /* Content                                                        */
+    /* -------------------------------------------------------------- */
+
     defineField({
       name: "title",
       title: "Service name",
@@ -128,6 +247,10 @@ export const service = defineType({
         "Optional artwork or photograph for this service.",
     }),
 
+    /* -------------------------------------------------------------- */
+    /* Pricing                                                        */
+    /* -------------------------------------------------------------- */
+
     defineField({
       name: "pricePrefix",
       title: "Price prefix",
@@ -166,6 +289,10 @@ export const service = defineType({
         "Optional short note such as “Final pricing depends on scope and complexity.”",
     }),
 
+    /* -------------------------------------------------------------- */
+    /* Sub-services                                                   */
+    /* -------------------------------------------------------------- */
+
     defineField({
       name: "subServices",
       title: "Sub-services",
@@ -173,6 +300,7 @@ export const service = defineType({
       group: "subServices",
       description:
         "Add the individual services available under this major service.",
+
       of: [
         {
           type: "object",
@@ -211,8 +339,6 @@ export const service = defineType({
               title: "Price prefix",
               type: "string",
               initialValue: "From",
-              description:
-                'For example: "From", "Starting from", or leave blank.',
             }),
 
             defineField({
@@ -243,11 +369,7 @@ export const service = defineType({
               name: "deliverables",
               title: "What is included",
               type: "array",
-              of: [
-                {
-                  type: "string",
-                },
-              ],
+              of: [{ type: "string" }],
             }),
 
             defineField({
@@ -274,6 +396,65 @@ export const service = defineType({
               description:
                 'For example: "Get a quote", "Enquire now", or "Start a project".',
             }),
+
+            /* ------------------------------------------------------ */
+            /* Sub-service custom inquiry form                        */
+            /* ------------------------------------------------------ */
+
+            defineField({
+              name: "useCustomInquiryForm",
+              title: "Use custom inquiry form",
+              type: "boolean",
+              initialValue: false,
+              description:
+                "Turn this on if this sub-service needs different questions from the main service form.",
+            }),
+
+            defineField({
+              name: "inquiryTitle",
+              title: "Inquiry form heading",
+              type: "string",
+              hidden: ({ parent }) =>
+                !parent?.useCustomInquiryForm,
+            }),
+
+            defineField({
+              name: "inquiryDescription",
+              title: "Inquiry form description",
+              type: "text",
+              rows: 3,
+              hidden: ({ parent }) =>
+                !parent?.useCustomInquiryForm,
+            }),
+
+            defineField({
+              name: "inquirySubmitText",
+              title: "Submit button text",
+              type: "string",
+              initialValue: "Send inquiry",
+              hidden: ({ parent }) =>
+                !parent?.useCustomInquiryForm,
+            }),
+
+            defineField({
+              name: "inquirySuccessMessage",
+              title: "Success message",
+              type: "text",
+              rows: 2,
+              hidden: ({ parent }) =>
+                !parent?.useCustomInquiryForm,
+            }),
+
+            defineField({
+              name: "inquiryFields",
+              title: "Custom inquiry questions",
+              type: "array",
+              of: [inquiryField],
+              hidden: ({ parent }) =>
+                !parent?.useCustomInquiryForm,
+              description:
+                "Add questions specific to this sub-service.",
+            }),
           ],
 
           preview: {
@@ -282,6 +463,7 @@ export const service = defineType({
               pricePrefix: "pricePrefix",
               startingPrice: "startingPrice",
               priceSuffix: "priceSuffix",
+              customForm: "useCustomInquiryForm",
             },
 
             prepare({
@@ -289,6 +471,13 @@ export const service = defineType({
               pricePrefix,
               startingPrice,
               priceSuffix,
+              customForm,
+            }: {
+              title?: string
+              pricePrefix?: string
+              startingPrice?: string
+              priceSuffix?: string
+              customForm?: boolean
             }) {
               const price = startingPrice
                 ? [
@@ -302,13 +491,17 @@ export const service = defineType({
 
               return {
                 title: title || "Untitled sub-service",
-                subtitle: price,
+                subtitle: `${price}${customForm ? " · Custom form" : ""}`,
               }
             },
           },
         },
       ],
     }),
+
+    /* -------------------------------------------------------------- */
+    /* Details                                                        */
+    /* -------------------------------------------------------------- */
 
     defineField({
       name: "forWho",
@@ -326,11 +519,7 @@ export const service = defineType({
       title: "What you get",
       type: "array",
       group: "details",
-      of: [
-        {
-          type: "string",
-        },
-      ],
+      of: [{ type: "string" }],
       description:
         "List the main deliverables included with this service.",
       validation: (rule) => rule.min(1),
@@ -341,15 +530,15 @@ export const service = defineType({
       title: "Expected outcomes",
       type: "array",
       group: "details",
-      of: [
-        {
-          type: "string",
-        },
-      ],
+      of: [{ type: "string" }],
       description:
         "List the main benefits or business outcomes.",
       validation: (rule) => rule.min(1),
     }),
+
+    /* -------------------------------------------------------------- */
+    /* Inquiry                                                        */
+    /* -------------------------------------------------------------- */
 
     defineField({
       name: "inquiryTitle",
@@ -358,7 +547,7 @@ export const service = defineType({
       group: "inquiry",
       initialValue: "Interested in this service?",
       description:
-        "Shown above the inquiry form or quote button for this service.",
+        "Shown at the top of this service's inquiry form.",
     }),
 
     defineField({
@@ -373,11 +562,109 @@ export const service = defineType({
 
     defineField({
       name: "inquiryButtonText",
-      title: "Inquiry button text",
+      title: "Open form button text",
       type: "string",
       group: "inquiry",
       initialValue: "Get a quote",
     }),
+
+    defineField({
+      name: "inquirySubmitText",
+      title: "Submit button text",
+      type: "string",
+      group: "inquiry",
+      initialValue: "Send inquiry",
+    }),
+
+    defineField({
+      name: "inquirySuccessMessage",
+      title: "Success message",
+      type: "text",
+      rows: 2,
+      group: "inquiry",
+      initialValue:
+        "Thanks for reaching out. We’ve received your inquiry and will get back to you shortly.",
+    }),
+
+    defineField({
+      name: "showNameField",
+      title: "Show name field",
+      type: "boolean",
+      group: "inquiry",
+      initialValue: true,
+    }),
+
+    defineField({
+      name: "showEmailField",
+      title: "Show email field",
+      type: "boolean",
+      group: "inquiry",
+      initialValue: true,
+    }),
+
+    defineField({
+      name: "showPhoneField",
+      title: "Show phone field",
+      type: "boolean",
+      group: "inquiry",
+      initialValue: true,
+    }),
+
+    defineField({
+      name: "showCompanyField",
+      title: "Show business / company field",
+      type: "boolean",
+      group: "inquiry",
+      initialValue: true,
+    }),
+
+    defineField({
+      name: "showBudgetField",
+      title: "Show budget field",
+      type: "boolean",
+      group: "inquiry",
+      initialValue: true,
+    }),
+
+    defineField({
+      name: "showMessageField",
+      title: "Show message field",
+      type: "boolean",
+      group: "inquiry",
+      initialValue: true,
+    }),
+
+    defineField({
+      name: "budgetOptions",
+      title: "Budget options",
+      type: "array",
+      group: "inquiry",
+      of: [{ type: "string" }],
+      description:
+        "Editable budget ranges displayed in the inquiry form.",
+      initialValue: [
+        "Under $500",
+        "$500 – $1,000",
+        "$1,000 – $2,500",
+        "$2,500 – $5,000",
+        "$5,000+",
+        "Not sure yet",
+      ],
+    }),
+
+    defineField({
+      name: "inquiryFields",
+      title: "Custom inquiry questions",
+      type: "array",
+      group: "inquiry",
+      of: [inquiryField],
+      description:
+        "Add questions specific to this service, such as website URL, number of products, platforms, launch date, content volume, or other requirements.",
+    }),
+
+    /* -------------------------------------------------------------- */
+    /* Settings                                                       */
+    /* -------------------------------------------------------------- */
 
     defineField({
       name: "displayOrder",
@@ -400,6 +687,10 @@ export const service = defineType({
         "Mark this service as featured for highlighted sections.",
       initialValue: false,
     }),
+
+    /* -------------------------------------------------------------- */
+    /* SEO                                                            */
+    /* -------------------------------------------------------------- */
 
     defineField({
       name: "seo",
@@ -452,6 +743,14 @@ export const service = defineType({
       pricePrefix,
       startingPrice,
       priceSuffix,
+    }: {
+      title?: string
+      subtitle?: string
+      media?: unknown
+      displayOrder?: number
+      pricePrefix?: string
+      startingPrice?: string
+      priceSuffix?: string
     }) {
       const orderPrefix =
         typeof displayOrder === "number"
