@@ -205,13 +205,11 @@ export const servicesQuery = groq`
       ${imageFields}
     }.image,
 
-    /* Pricing */
     pricePrefix,
     startingPrice,
     priceSuffix,
     pricingNote,
 
-    /* Sub-services */
     "subServices": subServices[]
       | order(
           displayOrder asc,
@@ -233,7 +231,6 @@ export const servicesQuery = groq`
 
         inquiryButtonText,
 
-        /* Optional custom sub-service inquiry form */
         useCustomInquiryForm,
         inquiryTitle,
         inquiryDescription,
@@ -256,12 +253,10 @@ export const servicesQuery = groq`
         }
       },
 
-    /* Service details */
     forWho,
     deliverables,
     outcomes,
 
-    /* Main service inquiry form */
     inquiryTitle,
     inquiryDescription,
     inquiryButtonText,
@@ -292,7 +287,6 @@ export const servicesQuery = groq`
       displayOrder
     },
 
-    /* Settings */
     featured,
     displayOrder,
 
