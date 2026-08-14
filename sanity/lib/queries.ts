@@ -299,6 +299,58 @@ export const servicesQuery = groq`
     ${seoFields}
   }
 `
+/* ------------------------------------------------------------------ *
+ * Services page (singleton)
+ * ------------------------------------------------------------------ */
+
+export const servicesPageQuery = groq`
+  *[_type == "servicesPage"][0]{
+    heroEyebrow,
+    heroTitle,
+    heroDescription,
+
+    bestForLabel,
+    deliverablesLabel,
+    outcomesLabel,
+    subServicesEyebrow,
+    subServicesTitle,
+    serviceInquiryEyebrow,
+
+    generalInquiryTitle,
+    generalInquiryDescription,
+    generalInquiryButtonText,
+    generalInquiryFormTitle,
+    generalInquiryFormDescription,
+    generalInquirySubmitText,
+    generalInquirySuccessMessage,
+
+    showNameField,
+    showEmailField,
+    showPhoneField,
+    showCompanyField,
+    showBudgetField,
+    showMessageField,
+
+    budgetOptions,
+
+    "inquiryFields": inquiryFields[]
+      | order(
+          displayOrder asc,
+          label asc
+        ){
+      label,
+      name,
+      fieldType,
+      placeholder,
+      required,
+      options,
+      helpText,
+      displayOrder
+    },
+
+    ${seoFields}
+  }
+`
 
 /* ------------------------------------------------------------------ *
  * Projects

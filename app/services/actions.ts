@@ -4,6 +4,11 @@ import {
   getService,
   resolveServiceInquiry,
 } from "@/lib/data/services"
+
+import {
+  getServicesPage,
+} from "@/lib/data/services-page"
+
 import { getWriteClient } from "@/sanity/lib/client"
 
 export type ServiceInquiryState = {
@@ -34,6 +39,111 @@ function makeAnswerKey(
   return `${fieldName}-${index}-${Date.now()}`
 }
 
+type NotificationData = {
+  name?: string
+  email?: string
+  phone?: string
+  company?: string
+  budget?: string
+  service?: string
+  subService?: string
+  message?: string
+  customAnswers?: string
+  subject: string
+}
+
+async function sendEmailNotification(
+  data: NotificationData,
+) {
+  const controller =
+    new AbortController()
+
+  const timeout =
+    setTimeout(
+      () => controller.abort(),
+      15000,
+    )
+
+  try {
+    await fetch(
+      FORMSUBMIT_ENDPOINT,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          Accept:
+            "application/json",
+
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+
+          Origin:
+            "https://formsubmit.co",
+
+          Referer:
+            "https://formsubmit.co/",
+        },
+
+        body: JSON.stringify({
+          name:
+            data.name || "—",
+
+          email:
+            data.email || "—",
+
+          phone:
+            data.phone || "—",
+
+          company:
+            data.company || "—",
+
+          budget:
+            data.budget || "—",
+
+          service:
+            data.service || "General inquiry",
+
+          sub_service:
+            data.subService || "—",
+
+          message:
+            data.message || "—",
+
+          custom_answers:
+            data.customAnswers || "—",
+
+          _subject:
+            data.subject,
+
+          _template:
+            "table",
+
+          _captcha:
+            "false",
+
+          _replyto:
+            data.email || undefined,
+        }),
+
+        signal:
+          controller.signal,
+
+        cache:
+          "no-store",
+      },
+    )
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Service / sub-service inquiry                                      */
+/* ------------------------------------------------------------------ */
+
 export async function submitServiceInquiry(
   _previousState: ServiceInquiryState,
   formData: FormData,
@@ -44,10 +154,6 @@ export async function submitServiceInquiry(
   const subServiceSlug =
     getText(formData, "subServiceSlug")
 
-  /*
-   * Honeypot field.
-   * Humans never see or fill this.
-   */
   const botTrap =
     getText(formData, "_websiteTrap")
 
@@ -86,13 +192,6 @@ export async function submitServiceInquiry(
         )
       : undefined
 
-  /*
-   * Never trust the browser to tell us
-   * which questions should exist.
-   *
-   * Resolve the form again on the server
-   * using the Sanity service configuration.
-   */
   const config =
     resolveServiceInquiry(
       service,
@@ -119,10 +218,6 @@ export async function submitServiceInquiry(
 
   const errors: Record<string, string> = {}
 
-  /* -------------------------------------------------------------- */
-  /* Core-field validation                                          */
-  /* -------------------------------------------------------------- */
-
   if (
     config.showNameField &&
     name.length < 2
@@ -139,40 +234,46 @@ export async function submitServiceInquiry(
       "Please enter a valid email address."
   }
 
-  /* -------------------------------------------------------------- */
-  /* Dynamic Sanity-configured questions                            */
-  /* -------------------------------------------------------------- */
+  const answers =
+    config.fields.map(
+      (field, index) => {
+        const formKey =
+          `custom__${field.name}`
 
-  const answers = config.fields.map(
-    (field, index) => {
-      const formKey =
-        `custom__${field.name}`
+        const value =
+          getText(
+            formData,
+            formKey,
+          )
 
-      const value =
-        getText(formData, formKey)
+        if (
+          field.required &&
+          !value
+        ) {
+          errors[formKey] =
+            `${field.label} is required.`
+        }
 
-      if (
-        field.required &&
-        !value
-      ) {
-        errors[formKey] =
-          `${field.label} is required.`
-      }
+        return {
+          _key:
+            makeAnswerKey(
+              field.name,
+              index,
+            ),
 
-      return {
-        _key: makeAnswerKey(
-          field.name,
-          index,
-        ),
+          _type:
+            "inquiryAnswer",
 
-        _type: "inquiryAnswer",
+          label:
+            field.label,
 
-        label: field.label,
-        key: field.name,
-        value,
-      }
-    },
-  )
+          key:
+            field.name,
+
+          value,
+        }
+      },
+    )
 
   if (
     Object.keys(errors).length > 0
@@ -187,10 +288,6 @@ export async function submitServiceInquiry(
 
   const submittedAt =
     new Date().toISOString()
-
-  /* -------------------------------------------------------------- */
-  /* Save inquiry into Sanity                                       */
-  /* -------------------------------------------------------------- */
 
   try {
     const writeClient =
@@ -272,19 +369,6 @@ export async function submitServiceInquiry(
     }
   }
 
-  /* -------------------------------------------------------------- */
-  /* Email notification                                              */
-  /* -------------------------------------------------------------- */
-
-  /*
-   * Sanity is now our source of truth.
-   *
-   * Email is treated as a notification layer.
-   * If email delivery fails but the Sanity
-   * document was successfully created, the
-   * customer still receives a success message.
-   */
-
   try {
     const customAnswers =
       answers
@@ -304,93 +388,26 @@ export async function submitServiceInquiry(
       subService?.name,
     ].filter(Boolean)
 
-    const controller =
-      new AbortController()
+    await sendEmailNotification({
+      name,
+      email,
+      phone,
+      company,
+      budget,
 
-    const timeout =
-      setTimeout(
-        () =>
-          controller.abort(),
-        15000,
-      )
+      service:
+        service.title,
 
-    try {
-      await fetch(
-        FORMSUBMIT_ENDPOINT,
-        {
-          method: "POST",
+      subService:
+        subService?.name,
 
-          headers: {
-            "Content-Type":
-              "application/json",
+      message,
 
-            Accept:
-              "application/json",
+      customAnswers,
 
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-
-            Origin:
-              "https://formsubmit.co",
-
-            Referer:
-              "https://formsubmit.co/",
-          },
-
-          body: JSON.stringify({
-            name:
-              name || "—",
-
-            email:
-              email || "—",
-
-            phone:
-              phone || "—",
-
-            company:
-              company || "—",
-
-            budget:
-              budget || "—",
-
-            service:
-              service.title,
-
-            sub_service:
-              subService?.name ||
-              "—",
-
-            message:
-              message || "—",
-
-            custom_answers:
-              customAnswers || "—",
-
-            _subject:
-              subjectParts.join(
-                " — ",
-              ),
-
-            _template:
-              "table",
-
-            _captcha:
-              "false",
-
-            _replyto:
-              email || undefined,
-          }),
-
-          signal:
-            controller.signal,
-
-          cache:
-            "no-store",
-        },
-      )
-    } finally {
-      clearTimeout(timeout)
-    }
+      subject:
+        subjectParts.join(" — "),
+    })
   } catch (error) {
     console.error(
       "[Service Inquiry] Email notification failed:",
@@ -400,8 +417,259 @@ export async function submitServiceInquiry(
 
   return {
     status: "success",
-
     message:
       config.successMessage,
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* General Services inquiry                                           */
+/* ------------------------------------------------------------------ */
+
+export async function submitGeneralServiceInquiry(
+  _previousState: ServiceInquiryState,
+  formData: FormData,
+): Promise<ServiceInquiryState> {
+  const botTrap =
+    getText(formData, "_websiteTrap")
+
+  if (botTrap) {
+    return {
+      status: "success",
+      message:
+        "Thanks! We’ve received your inquiry.",
+    }
+  }
+
+  /*
+   * Reload the Services Page configuration
+   * on the server instead of trusting the browser.
+   */
+  const page =
+    await getServicesPage()
+
+  const name =
+    getText(formData, "name")
+
+  const email =
+    getText(formData, "email")
+
+  const phone =
+    getText(formData, "phone")
+
+  const company =
+    getText(formData, "company")
+
+  const budget =
+    getText(formData, "budget")
+
+  const message =
+    getText(formData, "message")
+
+  const errors: Record<string, string> = {}
+
+  if (
+    page.showNameField &&
+    name.length < 2
+  ) {
+    errors.name =
+      "Please enter your name."
+  }
+
+  if (
+    page.showEmailField &&
+    !EMAIL_RE.test(email)
+  ) {
+    errors.email =
+      "Please enter a valid email address."
+  }
+
+  const answers =
+    page.inquiryFields.map(
+      (field, index) => {
+        const formKey =
+          `custom__${field.name}`
+
+        const value =
+          getText(
+            formData,
+            formKey,
+          )
+
+        if (
+          field.required &&
+          !value
+        ) {
+          errors[formKey] =
+            `${field.label} is required.`
+        }
+
+        return {
+          _key:
+            makeAnswerKey(
+              field.name,
+              index,
+            ),
+
+          _type:
+            "inquiryAnswer",
+
+          label:
+            field.label,
+
+          key:
+            field.name,
+
+          value,
+        }
+      },
+    )
+
+  if (
+    Object.keys(errors).length > 0
+  ) {
+    return {
+      status: "error",
+      message:
+        "Please check the highlighted fields.",
+      errors,
+    }
+  }
+
+  const submittedAt =
+    new Date().toISOString()
+
+  /* -------------------------------------------------------------- */
+  /* Save to Sanity                                                 */
+  /* -------------------------------------------------------------- */
+
+  try {
+    const writeClient =
+      getWriteClient()
+
+    await writeClient.create({
+      _type: "inquiry",
+
+      name:
+        page.showNameField
+          ? name
+          : undefined,
+
+      email:
+        page.showEmailField
+          ? email
+          : undefined,
+
+      phone:
+        page.showPhoneField
+          ? phone || undefined
+          : undefined,
+
+      company:
+        page.showCompanyField
+          ? company || undefined
+          : undefined,
+
+      budget:
+        page.showBudgetField
+          ? budget || undefined
+          : undefined,
+
+      message:
+        page.showMessageField
+          ? message || undefined
+          : undefined,
+
+      inquiryType:
+        "general",
+
+      /*
+       * General inquiries intentionally have
+       * no service or sub-service assigned yet.
+       */
+      service:
+        undefined,
+
+      serviceSlug:
+        undefined,
+
+      subService:
+        undefined,
+
+      subServiceSlug:
+        undefined,
+
+      answers,
+
+      submittedAt,
+
+      source:
+        "Services page — General inquiry",
+
+      status:
+        "new",
+
+      handled:
+        false,
+    })
+  } catch (error) {
+    console.error(
+      "[General Services Inquiry] Sanity save failed:",
+      error,
+    )
+
+    return {
+      status: "error",
+      message:
+        "We couldn’t save your inquiry right now. Please try again.",
+    }
+  }
+
+  /* -------------------------------------------------------------- */
+  /* Email notification                                             */
+  /* -------------------------------------------------------------- */
+
+  try {
+    const customAnswers =
+      answers
+        .filter(
+          (answer) =>
+            Boolean(answer.value),
+        )
+        .map(
+          (answer) =>
+            `${answer.label}: ${answer.value}`,
+        )
+        .join("\n")
+
+    await sendEmailNotification({
+      name,
+      email,
+      phone,
+      company,
+      budget,
+
+      service:
+        "General Services Inquiry",
+
+      message,
+
+      customAnswers,
+
+      subject:
+        "New TBM general services inquiry",
+    })
+  } catch (error) {
+    console.error(
+      "[General Services Inquiry] Email notification failed:",
+      error,
+    )
+  }
+
+  return {
+    status: "success",
+
+    message:
+      page.generalInquirySuccessMessage,
   }
 }

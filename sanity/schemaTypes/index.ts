@@ -13,6 +13,7 @@ import { sectionHeading } from "./objects/sectionHeading"
 import { siteSettings } from "./documents/siteSettings"
 import { homepage } from "./documents/homepage"
 import { aboutPage } from "./documents/aboutPage"
+import { servicesPage } from "./documents/servicesPage"
 import { service } from "./documents/service"
 import { project } from "./documents/project"
 import { post } from "./documents/post"
@@ -33,10 +34,12 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   socialLink,
   processStep,
   sectionHeading,
+
   // Documents
   siteSettings,
   homepage,
   aboutPage,
+  servicesPage,
   service,
   project,
   post,

@@ -165,7 +165,43 @@ export type Service = {
 
   seo?: Seo
 }
+/* ------------------------------------------------------------------ */
+/* Services page                                                      */
+/* ------------------------------------------------------------------ */
 
+export type ServicesPage = {
+  heroEyebrow: string
+  heroTitle: string
+  heroDescription: string
+
+  bestForLabel: string
+  deliverablesLabel: string
+  outcomesLabel: string
+  subServicesEyebrow: string
+  subServicesTitle: string
+  serviceInquiryEyebrow: string
+
+  generalInquiryTitle: string
+  generalInquiryDescription: string
+  generalInquiryButtonText: string
+
+  generalInquiryFormTitle: string
+  generalInquiryFormDescription: string
+  generalInquirySubmitText: string
+  generalInquirySuccessMessage: string
+
+  showNameField: boolean
+  showEmailField: boolean
+  showPhoneField: boolean
+  showCompanyField: boolean
+  showBudgetField: boolean
+  showMessageField: boolean
+
+  budgetOptions: string[]
+  inquiryFields: ServiceInquiryField[]
+
+  seo?: Seo
+}
 /* ------------------------------------------------------------------ */
 /* Projects                                                           */
 /* ------------------------------------------------------------------ */

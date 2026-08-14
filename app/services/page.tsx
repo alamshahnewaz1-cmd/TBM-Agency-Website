@@ -6,19 +6,23 @@ import {
   Sparkles,
 } from "lucide-react"
 
-import { ButtonLink } from "@/components/button-link"
+import { GeneralServicesInquiryModal } from "@/components/general-services-inquiry-modal"
+import { PageHero } from "@/components/page-hero"
 import { Reveal } from "@/components/reveal"
 import {
   Eyebrow,
   SectionHeading,
 } from "@/components/section-heading"
-import { PageHero } from "@/components/page-hero"
 import { ServiceInquiryModal } from "@/components/service-inquiry-modal"
 
 import {
   getServices,
   resolveServiceInquiry,
 } from "@/lib/data/services"
+
+import {
+  getServicesPage,
+} from "@/lib/data/services-page"
 
 export const metadata: Metadata = {
   title: "Services",
@@ -62,14 +66,20 @@ function formatPrice({
 }
 
 export default async function ServicesPage() {
-  const services = await getServices()
+  const [
+    services,
+    page,
+  ] = await Promise.all([
+    getServices(),
+    getServicesPage(),
+  ])
 
   return (
     <>
       <PageHero
-        eyebrow="Our services"
-        title="Everything your brand needs, under one roof"
-        description="Choose a major service, explore the individual services inside it, and enquire directly about exactly what your business needs."
+        eyebrow={page.heroEyebrow}
+        title={page.heroTitle}
+        description={page.heroDescription}
       />
 
       {/* Quick navigation */}
@@ -116,7 +126,9 @@ export default async function ServicesPage() {
                     </span>
 
                     <Eyebrow>
-                      {`${String(index + 1).padStart(
+                      {`${String(
+                        index + 1,
+                      ).padStart(
                         2,
                         "0",
                       )} — ${service.tagline}`}
@@ -144,15 +156,18 @@ export default async function ServicesPage() {
 
                         {service.pricingNote ? (
                           <p className="mt-2 text-xs leading-relaxed text-muted">
-                            {service.pricingNote}
+                            {
+                              service.pricingNote
+                            }
                           </p>
                         ) : null}
                       </div>
                     ) : null}
 
+                    {/* Best for */}
                     <div className="w-full rounded-2xl bg-paper-2/70 p-5">
                       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-                        Best for
+                        {page.bestForLabel}
                       </p>
 
                       <p className="mt-1 text-sm font-medium leading-relaxed text-ink">
@@ -162,7 +177,9 @@ export default async function ServicesPage() {
 
                     {/* Major-service inquiry */}
                     <ServiceInquiryModal
-                      config={serviceInquiry}
+                      config={
+                        serviceInquiry
+                      }
                       variant="accent"
                     />
                   </div>
@@ -172,16 +189,23 @@ export default async function ServicesPage() {
                 <div className="flex flex-col gap-8">
                   <Reveal delay={80}>
                     <div className="grid gap-6 sm:grid-cols-2">
+                      {/* Deliverables */}
                       <div className="rounded-3xl border border-line bg-card p-6">
                         <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-ink">
-                          What you get
+                          {
+                            page.deliverablesLabel
+                          }
                         </h3>
 
                         <ul className="mt-4 flex flex-col gap-3">
                           {service.deliverables.map(
-                            (deliverable) => (
+                            (
+                              deliverable,
+                            ) => (
                               <li
-                                key={deliverable}
+                                key={
+                                  deliverable
+                                }
                                 className="flex items-start gap-3 text-sm leading-relaxed text-muted"
                               >
                                 <Check
@@ -189,16 +213,21 @@ export default async function ServicesPage() {
                                   aria-hidden="true"
                                 />
 
-                                {deliverable}
+                                {
+                                  deliverable
+                                }
                               </li>
                             ),
                           )}
                         </ul>
                       </div>
 
+                      {/* Outcomes */}
                       <div className="rounded-3xl border border-line bg-card p-6">
                         <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-ink">
-                          Outcomes
+                          {
+                            page.outcomesLabel
+                          }
                         </h3>
 
                         <ul className="mt-4 flex flex-col gap-3">
@@ -224,22 +253,29 @@ export default async function ServicesPage() {
 
                   {/* Sub-services */}
                   {service.subServices &&
-                  service.subServices.length > 0 ? (
+                  service.subServices
+                    .length > 0 ? (
                     <Reveal delay={120}>
                       <div className="flex flex-col gap-5">
                         <div>
                           <Eyebrow>
-                            Available services
+                            {
+                              page.subServicesEyebrow
+                            }
                           </Eyebrow>
 
                           <h3 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">
-                            Choose what you need
+                            {
+                              page.subServicesTitle
+                            }
                           </h3>
                         </div>
 
                         <div className="grid gap-4">
                           {service.subServices.map(
-                            (subService) => {
+                            (
+                              subService,
+                            ) => {
                               const subServiceInquiry =
                                 resolveServiceInquiry(
                                   service,
@@ -284,10 +320,13 @@ export default async function ServicesPage() {
                                       {subService.deliverables &&
                                       subService
                                         .deliverables
-                                        .length > 0 ? (
+                                        .length >
+                                        0 ? (
                                         <ul className="mt-4 flex flex-col gap-2">
                                           {subService.deliverables.map(
-                                            (item) => (
+                                            (
+                                              item,
+                                            ) => (
                                               <li
                                                 key={
                                                   item
@@ -331,7 +370,7 @@ export default async function ServicesPage() {
                                         </p>
                                       ) : null}
 
-                                      {/* Sub-service-specific inquiry */}
+                                      {/* Sub-service inquiry */}
                                       <ServiceInquiryModal
                                         config={
                                           subServiceInquiry
@@ -353,7 +392,9 @@ export default async function ServicesPage() {
                   <Reveal delay={150}>
                     <div className="rounded-[28px] bg-ink p-7 text-paper sm:p-8">
                       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-paper/60">
-                        Enquire
+                        {
+                          page.serviceInquiryEyebrow
+                        }
                       </p>
 
                       <h3 className="mt-3 text-2xl font-black tracking-tight">
@@ -368,7 +409,9 @@ export default async function ServicesPage() {
 
                       <div className="mt-6">
                         <ServiceInquiryModal
-                          config={serviceInquiry}
+                          config={
+                            serviceInquiry
+                          }
                           variant="light"
                         />
                       </div>
@@ -387,16 +430,17 @@ export default async function ServicesPage() {
           <div className="flex flex-col items-center gap-6 rounded-[32px] border border-line bg-card px-7 py-14 text-center sm:px-12 sm:py-16">
             <SectionHeading
               align="center"
-              title="Not sure which service you need?"
-              description="Tell us about your business, your goals and your budget. We’ll help you work out the right mix of services."
+              title={
+                page.generalInquiryTitle
+              }
+              description={
+                page.generalInquiryDescription
+              }
             />
 
-            <ButtonLink
-              href="/contact"
-              withIcon
-            >
-              Make a general inquiry
-            </ButtonLink>
+            <GeneralServicesInquiryModal
+              page={page}
+            />
           </div>
         </Reveal>
       </section>
