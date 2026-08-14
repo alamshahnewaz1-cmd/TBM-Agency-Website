@@ -725,58 +725,50 @@ export const service = defineType({
   ],
 
   preview: {
-    select: {
-      title: "title",
-      subtitle: "tagline",
-      media: "coverImage",
-      displayOrder: "displayOrder",
-      pricePrefix: "pricePrefix",
-      startingPrice: "startingPrice",
-      priceSuffix: "priceSuffix",
-    },
+  select: {
+    title: "title",
+    subtitle: "tagline",
+    media: "coverImage",
+    displayOrder: "displayOrder",
+    pricePrefix: "pricePrefix",
+    startingPrice: "startingPrice",
+    priceSuffix: "priceSuffix",
+  },
 
-    prepare({
-      title,
-      subtitle,
-      media,
-      displayOrder,
-      pricePrefix,
-      startingPrice,
-      priceSuffix,
-    }: {
-      title?: string
-      subtitle?: string
-      media?: unknown
-      displayOrder?: number
-      pricePrefix?: string
-      startingPrice?: string
-      priceSuffix?: string
-    }) {
-      const orderPrefix =
-        typeof displayOrder === "number"
-          ? `${displayOrder}. `
-          : ""
-
-      const price = startingPrice
-        ? [
-            pricePrefix,
-            startingPrice,
-            priceSuffix,
-          ]
-            .filter(Boolean)
-            .join(" ")
+  prepare({
+    title,
+    subtitle,
+    media,
+    displayOrder,
+    pricePrefix,
+    startingPrice,
+    priceSuffix,
+  }) {
+    const orderPrefix =
+      typeof displayOrder === "number"
+        ? `${displayOrder}. `
         : ""
 
-      const subtitleParts = [
-        subtitle || "No tagline",
-        price,
-      ].filter(Boolean)
+    const price = startingPrice
+      ? [
+          pricePrefix,
+          startingPrice,
+          priceSuffix,
+        ]
+          .filter(Boolean)
+          .join(" ")
+      : ""
 
-      return {
-        title: title || "Untitled service",
-        subtitle: `${orderPrefix}${subtitleParts.join(" · ")}`,
-        media,
-      }
-    },
+    const subtitleParts = [
+      subtitle || "No tagline",
+      price,
+    ].filter(Boolean)
+
+    return {
+      title: title || "Untitled service",
+      subtitle: `${orderPrefix}${subtitleParts.join(" · ")}`,
+      media,
+    }
   },
+},
 })
