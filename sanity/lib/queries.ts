@@ -308,19 +308,23 @@ const postFields = /* groq */ `
     "The Backstage Marketing"
   ),
 
-  "date": publishDate,
+  "date": publishedAt,
   readingTime,
 
-  "cover": coverImage{
+  "cover": cover{
     ${imageFields}
   }.image,
 
-  featured
+  featured,
+  tags
 `
 
 export const postsQuery = groq`
   *[_type == "post"]
-  | order(publishDate desc){
+  | order(
+      featured desc,
+      publishedAt desc
+    ){
     ${postFields}
   }
 `
@@ -355,15 +359,21 @@ export const relatedPostsQuery = groq`
         coalesce(category->title, "") == $category => 0,
         1
       ) asc,
-      publishDate desc
+      publishedAt desc
     )[0...$limit]{
     ${postFields}
   }
 `
 
 export const blogCategoriesQuery = groq`
-  *[_type == "category"]
-  | order(title asc){
+  *[
+    _type == "category" &&
+    "blog" in appliesTo
+  ]
+  | order(
+      order asc,
+      title asc
+    ){
     "title": title
   }
 `

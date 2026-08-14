@@ -6,148 +6,347 @@ export const post = defineType({
   title: "Blog Post",
   type: "document",
   icon: FileText,
+
   groups: [
-    { name: "content", title: "Content", default: true },
-    { name: "meta", title: "Meta" },
-    { name: "settings", title: "Settings" },
+    {
+      name: "content",
+      title: "Content",
+      default: true,
+    },
+    {
+      name: "publishing",
+      title: "Publishing",
+    },
+    {
+      name: "settings",
+      title: "Settings",
+    },
+    {
+      name: "seo",
+      title: "SEO",
+    },
   ],
+
   fields: [
     defineField({
       name: "title",
-      title: "Title",
+      title: "Article title",
       type: "string",
       group: "content",
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "slug",
       title: "Slug",
       type: "slug",
       group: "content",
-      options: { source: "title", maxLength: 96 },
+      options: {
+        source: "title",
+        maxLength: 96,
+      },
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "excerpt",
       title: "Excerpt",
       type: "text",
       rows: 3,
       group: "content",
-      description: "Short summary shown on cards and in search results.",
+      description:
+        "Short summary shown on the Blog page, article cards and search results.",
       validation: (rule) => rule.required().max(300),
     }),
+
     defineField({
       name: "cover",
       title: "Cover image",
       type: "image",
       group: "content",
-      options: { hotspot: true },
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alternative text",
+          type: "string",
+          description:
+            "Describe the image briefly for accessibility and search engines.",
+        }),
+      ],
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "body",
-      title: "Body",
+      title: "Article body",
       type: "array",
       group: "content",
       of: [
         {
           type: "block",
+
           styles: [
-            { title: "Normal", value: "normal" },
-            { title: "Heading", value: "h2" },
-            { title: "Subheading", value: "h3" },
-            { title: "Quote", value: "blockquote" },
+            {
+              title: "Normal",
+              value: "normal",
+            },
+            {
+              title: "Heading",
+              value: "h2",
+            },
+            {
+              title: "Subheading",
+              value: "h3",
+            },
+            {
+              title: "Quote",
+              value: "blockquote",
+            },
           ],
-          lists: [{ title: "Bullet", value: "bullet" }],
+
+          lists: [
+            {
+              title: "Bullet list",
+              value: "bullet",
+            },
+            {
+              title: "Numbered list",
+              value: "number",
+            },
+          ],
+
           marks: {
             decorators: [
-              { title: "Bold", value: "strong" },
-              { title: "Italic", value: "em" },
+              {
+                title: "Bold",
+                value: "strong",
+              },
+              {
+                title: "Italic",
+                value: "em",
+              },
             ],
+
             annotations: [
               {
                 name: "link",
                 type: "object",
                 title: "Link",
+
                 fields: [
-                  {
+                  defineField({
                     name: "href",
-                    type: "url",
                     title: "URL",
+                    type: "url",
+
                     validation: (rule) =>
-                      rule.uri({ scheme: ["http", "https", "mailto"] }),
-                  },
+                      rule.uri({
+                        scheme: ["http", "https", "mailto"],
+                      }),
+                  }),
                 ],
               },
             ],
           },
         },
-        { type: "image", options: { hotspot: true } },
+
+        {
+          type: "image",
+
+          options: {
+            hotspot: true,
+          },
+
+          fields: [
+            defineField({
+              name: "alt",
+              title: "Alternative text",
+              type: "string",
+            }),
+
+            defineField({
+              name: "caption",
+              title: "Caption",
+              type: "string",
+            }),
+          ],
+        },
       ],
+
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "author",
       title: "Author",
       type: "reference",
-      to: [{ type: "author" }],
-      group: "meta",
+      group: "publishing",
+
+      to: [
+        {
+          type: "author",
+        },
+      ],
+
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "category",
       title: "Category",
       type: "reference",
-      to: [{ type: "category" }],
-      group: "meta",
-      options: { filter: 'appliesTo match "blog"' },
+      group: "publishing",
+
+      to: [
+        {
+          type: "category",
+        },
+      ],
+
+      options: {
+        filter: 'appliesTo match "blog"',
+      },
+
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "tags",
       title: "Tags",
       type: "array",
-      of: [{ type: "string" }],
-      group: "meta",
-      options: { layout: "tags" },
+      group: "publishing",
+
+      of: [
+        {
+          type: "string",
+        },
+      ],
+
+      options: {
+        layout: "tags",
+      },
+
+      description:
+        "Optional keywords used to organise and relate articles.",
     }),
+
     defineField({
       name: "publishedAt",
       title: "Publish date",
       type: "datetime",
-      group: "meta",
+      group: "publishing",
+
       initialValue: () => new Date().toISOString(),
+
       validation: (rule) => rule.required(),
     }),
+
     defineField({
       name: "readingTime",
       title: "Reading time",
       type: "string",
-      group: "meta",
-      description: 'e.g. "6 min read". Leave blank to calculate automatically.',
+      group: "publishing",
+
+      description:
+        'For example: "6 min read".',
     }),
+
     defineField({
       name: "featured",
-      title: "Featured",
+      title: "Featured article",
       type: "boolean",
       group: "settings",
+
+      description:
+        "Featured articles can be prioritised on the Blog page.",
+
       initialValue: false,
     }),
+
     defineField({
       name: "seo",
       title: "SEO",
       type: "seo",
-      group: "settings",
+      group: "seo",
     }),
   ],
+
   orderings: [
     {
-      title: "Publish date, newest",
+      title: "Newest first",
       name: "publishedAtDesc",
-      by: [{ field: "publishedAt", direction: "desc" }],
+
+      by: [
+        {
+          field: "publishedAt",
+          direction: "desc",
+        },
+      ],
+    },
+
+    {
+      title: "Oldest first",
+      name: "publishedAtAsc",
+
+      by: [
+        {
+          field: "publishedAt",
+          direction: "asc",
+        },
+      ],
+    },
+
+    {
+      title: "Article title",
+      name: "titleAsc",
+
+      by: [
+        {
+          field: "title",
+          direction: "asc",
+        },
+      ],
     },
   ],
+
   preview: {
-    select: { title: "title", subtitle: "category.title", media: "cover" },
+    select: {
+      title: "title",
+      category: "category.title",
+      author: "author.name",
+      date: "publishedAt",
+      media: "cover",
+    },
+
+    prepare({
+      title,
+      category,
+      author,
+      date,
+      media,
+    }) {
+      const meta = [
+        category,
+        author,
+        date
+          ? new Date(date).toLocaleDateString("en-AU", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+
+      return {
+        title: title || "Untitled article",
+        subtitle: meta || "Blog post",
+        media,
+      }
+    },
   },
 })
