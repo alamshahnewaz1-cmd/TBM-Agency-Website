@@ -205,11 +205,13 @@ export const servicesQuery = groq`
       ${imageFields}
     }.image,
 
+    /* Pricing */
     pricePrefix,
     startingPrice,
     priceSuffix,
     pricingNote,
 
+    /* Sub-services */
     "subServices": subServices[]
       | order(
           displayOrder asc,
@@ -228,17 +230,69 @@ export const servicesQuery = groq`
 
         featured,
         displayOrder,
-        inquiryButtonText
+
+        inquiryButtonText,
+
+        /* Optional custom sub-service inquiry form */
+        useCustomInquiryForm,
+        inquiryTitle,
+        inquiryDescription,
+        inquirySubmitText,
+        inquirySuccessMessage,
+
+        "inquiryFields": inquiryFields[]
+          | order(
+              displayOrder asc,
+              label asc
+            ){
+          label,
+          name,
+          fieldType,
+          placeholder,
+          required,
+          options,
+          helpText,
+          displayOrder
+        }
       },
 
+    /* Service details */
     forWho,
     deliverables,
     outcomes,
 
+    /* Main service inquiry form */
     inquiryTitle,
     inquiryDescription,
     inquiryButtonText,
+    inquirySubmitText,
+    inquirySuccessMessage,
 
+    showNameField,
+    showEmailField,
+    showPhoneField,
+    showCompanyField,
+    showBudgetField,
+    showMessageField,
+
+    budgetOptions,
+
+    "inquiryFields": inquiryFields[]
+      | order(
+          displayOrder asc,
+          label asc
+        ){
+      label,
+      name,
+      fieldType,
+      placeholder,
+      required,
+      options,
+      helpText,
+      displayOrder
+    },
+
+    /* Settings */
     featured,
     displayOrder,
 

@@ -5,12 +5,35 @@ import { resolveIcon } from "@/lib/icon-map"
 
 import type {
   Service,
+  ServiceInquiryField,
+  ServiceInquiryFieldType,
   ServiceSubService,
   SanityImageRef,
   Seo,
 } from "@/lib/types"
 
 import { services as fallbackServices } from "@/lib/services"
+
+const DEFAULT_BUDGET_OPTIONS = [
+  "Under $500",
+  "$500 – $1,000",
+  "$1,000 – $2,500",
+  "$2,500 – $5,000",
+  "$5,000+",
+  "Not sure yet",
+]
+
+type SanityInquiryField = {
+  label: string
+  name: string
+  fieldType: ServiceInquiryFieldType
+
+  placeholder?: string
+  required?: boolean
+  options?: string[]
+  helpText?: string
+  displayOrder?: number
+}
 
 type SanitySubService = {
   name: string
@@ -28,6 +51,14 @@ type SanitySubService = {
   displayOrder?: number
 
   inquiryButtonText?: string
+
+  useCustomInquiryForm?: boolean
+
+  inquiryTitle?: string
+  inquiryDescription?: string
+  inquirySubmitText?: string
+  inquirySuccessMessage?: string
+  inquiryFields?: SanityInquiryField[]
 }
 
 type SanityService = {
@@ -54,11 +85,39 @@ type SanityService = {
   inquiryTitle?: string
   inquiryDescription?: string
   inquiryButtonText?: string
+  inquirySubmitText?: string
+  inquirySuccessMessage?: string
+
+  showNameField?: boolean
+  showEmailField?: boolean
+  showPhoneField?: boolean
+  showCompanyField?: boolean
+  showBudgetField?: boolean
+  showMessageField?: boolean
+
+  budgetOptions?: string[]
+  inquiryFields?: SanityInquiryField[]
 
   featured?: boolean
   displayOrder?: number
 
   seo?: Seo
+}
+
+function mapInquiryField(
+  field: SanityInquiryField,
+): ServiceInquiryField {
+  return {
+    label: field.label,
+    name: field.name,
+    fieldType: field.fieldType,
+
+    placeholder: field.placeholder,
+    required: field.required ?? false,
+    options: field.options ?? [],
+    helpText: field.helpText,
+    displayOrder: field.displayOrder ?? 0,
+  }
 }
 
 function mapSubService(
@@ -81,58 +140,266 @@ function mapSubService(
 
     inquiryButtonText:
       subService.inquiryButtonText ?? "Get a quote",
+
+    useCustomInquiryForm:
+      subService.useCustomInquiryForm ?? false,
+
+    inquiryTitle: subService.inquiryTitle,
+    inquiryDescription: subService.inquiryDescription,
+    inquirySubmitText: subService.inquirySubmitText,
+    inquirySuccessMessage:
+      subService.inquirySuccessMessage,
+
+    inquiryFields:
+      subService.inquiryFields?.map(mapInquiryField),
   }
 }
 
-function mapService(s: SanityService): Service {
+function mapService(
+  service: SanityService,
+): Service {
   return {
-    slug: s.slug,
-    title: s.title,
-    tagline: s.tagline,
-    summary: s.summary,
-    description: s.description,
+    slug: service.slug,
+    title: service.title,
+    tagline: service.tagline,
+    summary: service.summary,
+    description: service.description,
 
-    icon: resolveIcon(s.icon),
-    coverImage: s.coverImage ?? null,
+    icon: resolveIcon(service.icon),
+    coverImage: service.coverImage ?? null,
 
-    pricePrefix: s.pricePrefix,
-    startingPrice: s.startingPrice,
-    priceSuffix: s.priceSuffix,
-    pricingNote: s.pricingNote,
+    /* Pricing */
+    pricePrefix: service.pricePrefix,
+    startingPrice: service.startingPrice,
+    priceSuffix: service.priceSuffix,
+    pricingNote: service.pricingNote,
 
+    /* Sub-services */
     subServices:
-      s.subServices?.map(mapSubService) ?? [],
+      service.subServices?.map(mapSubService) ?? [],
 
-    forWho: s.forWho,
-    deliverables: s.deliverables ?? [],
-    outcomes: s.outcomes ?? [],
+    /* Details */
+    forWho: service.forWho,
+    deliverables: service.deliverables ?? [],
+    outcomes: service.outcomes ?? [],
 
+    /* Inquiry copy */
     inquiryTitle:
-      s.inquiryTitle ?? "Interested in this service?",
+      service.inquiryTitle ??
+      "Interested in this service?",
 
     inquiryDescription:
-      s.inquiryDescription ??
+      service.inquiryDescription ??
       "Tell us about your project and we’ll recommend the right approach.",
 
     inquiryButtonText:
-      s.inquiryButtonText ?? "Get a quote",
+      service.inquiryButtonText ?? "Get a quote",
 
-    featured: s.featured ?? false,
-    displayOrder: s.displayOrder ?? 0,
+    inquirySubmitText:
+      service.inquirySubmitText ?? "Send inquiry",
 
-    seo: s.seo ?? null,
+    inquirySuccessMessage:
+      service.inquirySuccessMessage ??
+      "Thanks for reaching out. We’ve received your inquiry and will get back to you shortly.",
+
+    /*
+     * Existing Sanity documents were created before these switches existed.
+     *
+     * undefined therefore means ON.
+     *
+     * Only an explicitly saved false value hides a field.
+     */
+    showNameField:
+      service.showNameField ?? true,
+
+    showEmailField:
+      service.showEmailField ?? true,
+
+    showPhoneField:
+      service.showPhoneField ?? true,
+
+    showCompanyField:
+      service.showCompanyField ?? true,
+
+    showBudgetField:
+      service.showBudgetField ?? true,
+
+    showMessageField:
+      service.showMessageField ?? true,
+
+    budgetOptions:
+      service.budgetOptions &&
+      service.budgetOptions.length > 0
+        ? service.budgetOptions
+        : DEFAULT_BUDGET_OPTIONS,
+
+    inquiryFields:
+      service.inquiryFields?.map(mapInquiryField) ?? [],
+
+    /* Settings */
+    featured: service.featured ?? false,
+    displayOrder: service.displayOrder ?? 0,
+
+    seo: service.seo ?? null,
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Resolved inquiry configuration                                     */
+/* ------------------------------------------------------------------ */
+
+export type ResolvedServiceInquiry = {
+  serviceTitle: string
+  serviceSlug: string
+
+  subServiceTitle?: string
+  subServiceSlug?: string
+
+  title: string
+  description: string
+  buttonText: string
+  submitText: string
+  successMessage: string
+
+  showNameField: boolean
+  showEmailField: boolean
+  showPhoneField: boolean
+  showCompanyField: boolean
+  showBudgetField: boolean
+  showMessageField: boolean
+
+  budgetOptions: string[]
+  fields: ServiceInquiryField[]
+}
+
+/**
+ * Builds the exact form configuration that should be shown to the visitor.
+ *
+ * Main service:
+ *   Uses the service's inquiry form.
+ *
+ * Sub-service without a custom form:
+ *   Inherits the main service form.
+ *
+ * Sub-service with a custom form:
+ *   Keeps the parent's core contact fields and budget settings,
+ *   but can replace the heading, description, submit copy,
+ *   success message and custom questions.
+ */
+export function resolveServiceInquiry(
+  service: Service,
+  subService?: ServiceSubService,
+): ResolvedServiceInquiry {
+  const useCustomForm =
+    Boolean(
+      subService?.useCustomInquiryForm,
+    )
+
+  const title =
+    useCustomForm
+      ? subService?.inquiryTitle ||
+        service.inquiryTitle ||
+        "Interested in this service?"
+      : service.inquiryTitle ||
+        "Interested in this service?"
+
+  const description =
+    useCustomForm
+      ? subService?.inquiryDescription ||
+        service.inquiryDescription ||
+        "Tell us about your project and we’ll recommend the right approach."
+      : service.inquiryDescription ||
+        "Tell us about your project and we’ll recommend the right approach."
+
+  const submitText =
+    useCustomForm
+      ? subService?.inquirySubmitText ||
+        service.inquirySubmitText ||
+        "Send inquiry"
+      : service.inquirySubmitText ||
+        "Send inquiry"
+
+  const successMessage =
+    useCustomForm
+      ? subService?.inquirySuccessMessage ||
+        service.inquirySuccessMessage ||
+        "Thanks for reaching out. We’ve received your inquiry and will get back to you shortly."
+      : service.inquirySuccessMessage ||
+        "Thanks for reaching out. We’ve received your inquiry and will get back to you shortly."
+
+  /*
+   * A custom sub-service form replaces only the custom questions.
+   * Core contact fields still inherit from the parent service.
+   */
+  const fields =
+    useCustomForm
+      ? subService?.inquiryFields ?? []
+      : service.inquiryFields ?? []
+
+  return {
+    serviceTitle: service.title,
+    serviceSlug: service.slug,
+
+    subServiceTitle: subService?.name,
+    subServiceSlug: subService?.slug,
+
+    title,
+    description,
+
+    buttonText:
+      subService?.inquiryButtonText ||
+      service.inquiryButtonText ||
+      "Get a quote",
+
+    submitText,
+    successMessage,
+
+    /*
+     * !== false also protects bundled fallback content,
+     * where these newer properties may not exist yet.
+     */
+    showNameField:
+      service.showNameField !== false,
+
+    showEmailField:
+      service.showEmailField !== false,
+
+    showPhoneField:
+      service.showPhoneField !== false,
+
+    showCompanyField:
+      service.showCompanyField !== false,
+
+    showBudgetField:
+      service.showBudgetField !== false,
+
+    showMessageField:
+      service.showMessageField !== false,
+
+    budgetOptions:
+      service.budgetOptions &&
+      service.budgetOptions.length > 0
+        ? service.budgetOptions
+        : DEFAULT_BUDGET_OPTIONS,
+
+    fields,
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Data access                                                        */
+/* ------------------------------------------------------------------ */
 
 /**
  * All services.
  * Sanity CMS is the primary source, with bundled content as fallback.
  */
 export async function getServices(): Promise<Service[]> {
-  const data = await sanityFetch<SanityService[]>({
-    query: servicesQuery,
-    tags: ["service"],
-  })
+  const data =
+    await sanityFetch<SanityService[]>({
+      query: servicesQuery,
+      tags: ["service"],
+    })
 
   if (data && data.length > 0) {
     return data.map(mapService)
@@ -149,7 +416,9 @@ export async function getService(
 ): Promise<Service | undefined> {
   const all = await getServices()
 
-  return all.find((service) => service.slug === slug)
+  return all.find(
+    (service) => service.slug === slug,
+  )
 }
 
 export { imageUrl }

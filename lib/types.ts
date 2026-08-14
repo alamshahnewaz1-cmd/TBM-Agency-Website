@@ -65,6 +65,28 @@ export type SiteSettings = {
 /* Services                                                           */
 /* ------------------------------------------------------------------ */
 
+export type ServiceInquiryFieldType =
+  | "text"
+  | "email"
+  | "tel"
+  | "url"
+  | "number"
+  | "textarea"
+  | "select"
+  | "boolean"
+
+export type ServiceInquiryField = {
+  label: string
+  name: string
+  fieldType: ServiceInquiryFieldType
+
+  placeholder?: string
+  required?: boolean
+  options?: string[]
+  helpText?: string
+  displayOrder?: number
+}
+
 export type ServiceSubService = {
   name: string
   slug: string
@@ -81,6 +103,19 @@ export type ServiceSubService = {
   displayOrder?: number
 
   inquiryButtonText?: string
+
+  /**
+   * When false, the sub-service uses the parent service inquiry form.
+   * When true, the custom heading/copy/questions below override the
+   * corresponding parent-service values.
+   */
+  useCustomInquiryForm?: boolean
+
+  inquiryTitle?: string
+  inquiryDescription?: string
+  inquirySubmitText?: string
+  inquirySuccessMessage?: string
+  inquiryFields?: ServiceInquiryField[]
 }
 
 export type Service = {
@@ -93,21 +128,38 @@ export type Service = {
   icon: LucideIcon
   coverImage?: SanityImageRef
 
+  /* Pricing */
   pricePrefix?: string
   startingPrice?: string
   priceSuffix?: string
   pricingNote?: string
 
+  /* Sub-services */
   subServices?: ServiceSubService[]
 
+  /* Details */
   forWho: string
   deliverables: string[]
   outcomes: string[]
 
+  /* Inquiry form */
   inquiryTitle?: string
   inquiryDescription?: string
   inquiryButtonText?: string
+  inquirySubmitText?: string
+  inquirySuccessMessage?: string
 
+  showNameField?: boolean
+  showEmailField?: boolean
+  showPhoneField?: boolean
+  showCompanyField?: boolean
+  showBudgetField?: boolean
+  showMessageField?: boolean
+
+  budgetOptions?: string[]
+  inquiryFields?: ServiceInquiryField[]
+
+  /* Settings */
   featured?: boolean
   displayOrder?: number
 
