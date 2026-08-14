@@ -16,8 +16,20 @@ export const service = defineType({
       default: true,
     },
     {
+      name: "pricing",
+      title: "Pricing",
+    },
+    {
+      name: "subServices",
+      title: "Sub-services",
+    },
+    {
       name: "details",
       title: "Details",
+    },
+    {
+      name: "inquiry",
+      title: "Inquiry",
     },
     {
       name: "settings",
@@ -117,6 +129,188 @@ export const service = defineType({
     }),
 
     defineField({
+      name: "pricePrefix",
+      title: "Price prefix",
+      type: "string",
+      group: "pricing",
+      initialValue: "From",
+      description:
+        'For example: "From", "Starting from", or leave blank.',
+    }),
+
+    defineField({
+      name: "startingPrice",
+      title: "Starting price",
+      type: "string",
+      group: "pricing",
+      description:
+        'For example: "$499". Keep the currency symbol here.',
+    }),
+
+    defineField({
+      name: "priceSuffix",
+      title: "Price suffix",
+      type: "string",
+      group: "pricing",
+      description:
+        'Optional. For example: "/month", "/project", or "+ GST".',
+    }),
+
+    defineField({
+      name: "pricingNote",
+      title: "Pricing note",
+      type: "text",
+      rows: 2,
+      group: "pricing",
+      description:
+        "Optional short note such as “Final pricing depends on scope and complexity.”",
+    }),
+
+    defineField({
+      name: "subServices",
+      title: "Sub-services",
+      type: "array",
+      group: "subServices",
+      description:
+        "Add the individual services available under this major service.",
+      of: [
+        {
+          type: "object",
+          name: "subService",
+          title: "Sub-service",
+
+          fields: [
+            defineField({
+              name: "name",
+              title: "Sub-service name",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+
+            defineField({
+              name: "slug",
+              title: "Slug",
+              type: "slug",
+              options: {
+                source: "name",
+                maxLength: 96,
+              },
+              validation: (rule) => rule.required(),
+            }),
+
+            defineField({
+              name: "summary",
+              title: "Short description",
+              type: "text",
+              rows: 3,
+              validation: (rule) => rule.required(),
+            }),
+
+            defineField({
+              name: "pricePrefix",
+              title: "Price prefix",
+              type: "string",
+              initialValue: "From",
+              description:
+                'For example: "From", "Starting from", or leave blank.',
+            }),
+
+            defineField({
+              name: "startingPrice",
+              title: "Starting price",
+              type: "string",
+              description:
+                'For example: "$499".',
+            }),
+
+            defineField({
+              name: "priceSuffix",
+              title: "Price suffix",
+              type: "string",
+              description:
+                'Optional. For example: "/month" or "/project".',
+            }),
+
+            defineField({
+              name: "pricingNote",
+              title: "Pricing note",
+              type: "string",
+              description:
+                "Optional short pricing disclaimer.",
+            }),
+
+            defineField({
+              name: "deliverables",
+              title: "What is included",
+              type: "array",
+              of: [
+                {
+                  type: "string",
+                },
+              ],
+            }),
+
+            defineField({
+              name: "featured",
+              title: "Featured sub-service",
+              type: "boolean",
+              initialValue: false,
+            }),
+
+            defineField({
+              name: "displayOrder",
+              title: "Display order",
+              type: "number",
+              initialValue: 0,
+              validation: (rule) =>
+                rule.integer().min(0),
+            }),
+
+            defineField({
+              name: "inquiryButtonText",
+              title: "Inquiry button text",
+              type: "string",
+              initialValue: "Get a quote",
+              description:
+                'For example: "Get a quote", "Enquire now", or "Start a project".',
+            }),
+          ],
+
+          preview: {
+            select: {
+              title: "name",
+              pricePrefix: "pricePrefix",
+              startingPrice: "startingPrice",
+              priceSuffix: "priceSuffix",
+            },
+
+            prepare({
+              title,
+              pricePrefix,
+              startingPrice,
+              priceSuffix,
+            }) {
+              const price = startingPrice
+                ? [
+                    pricePrefix,
+                    startingPrice,
+                    priceSuffix,
+                  ]
+                    .filter(Boolean)
+                    .join(" ")
+                : "No price set"
+
+              return {
+                title: title || "Untitled sub-service",
+                subtitle: price,
+              }
+            },
+          },
+        },
+      ],
+    }),
+
+    defineField({
       name: "forWho",
       title: "Best for",
       type: "text",
@@ -158,6 +352,34 @@ export const service = defineType({
     }),
 
     defineField({
+      name: "inquiryTitle",
+      title: "Inquiry heading",
+      type: "string",
+      group: "inquiry",
+      initialValue: "Interested in this service?",
+      description:
+        "Shown above the inquiry form or quote button for this service.",
+    }),
+
+    defineField({
+      name: "inquiryDescription",
+      title: "Inquiry description",
+      type: "text",
+      rows: 3,
+      group: "inquiry",
+      initialValue:
+        "Tell us about your project and we’ll recommend the right approach.",
+    }),
+
+    defineField({
+      name: "inquiryButtonText",
+      title: "Inquiry button text",
+      type: "string",
+      group: "inquiry",
+      initialValue: "Get a quote",
+    }),
+
+    defineField({
       name: "displayOrder",
       title: "Display order",
       type: "number",
@@ -165,7 +387,8 @@ export const service = defineType({
       description:
         "Lower numbers appear first. Use 1, 2, 3 and so on.",
       initialValue: 0,
-      validation: (rule) => rule.required().integer().min(0),
+      validation: (rule) =>
+        rule.required().integer().min(0),
     }),
 
     defineField({
@@ -174,7 +397,7 @@ export const service = defineType({
       type: "boolean",
       group: "settings",
       description:
-        "Mark this service as featured for future highlighted sections.",
+        "Mark this service as featured for highlighted sections.",
       initialValue: false,
     }),
 
@@ -197,6 +420,7 @@ export const service = defineType({
         },
       ],
     },
+
     {
       title: "Service name",
       name: "titleAsc",
@@ -215,6 +439,9 @@ export const service = defineType({
       subtitle: "tagline",
       media: "coverImage",
       displayOrder: "displayOrder",
+      pricePrefix: "pricePrefix",
+      startingPrice: "startingPrice",
+      priceSuffix: "priceSuffix",
     },
 
     prepare({
@@ -222,15 +449,33 @@ export const service = defineType({
       subtitle,
       media,
       displayOrder,
+      pricePrefix,
+      startingPrice,
+      priceSuffix,
     }) {
       const orderPrefix =
         typeof displayOrder === "number"
           ? `${displayOrder}. `
           : ""
 
+      const price = startingPrice
+        ? [
+            pricePrefix,
+            startingPrice,
+            priceSuffix,
+          ]
+            .filter(Boolean)
+            .join(" ")
+        : ""
+
+      const subtitleParts = [
+        subtitle || "No tagline",
+        price,
+      ].filter(Boolean)
+
       return {
         title: title || "Untitled service",
-        subtitle: `${orderPrefix}${subtitle || "No tagline"}`,
+        subtitle: `${orderPrefix}${subtitleParts.join(" · ")}`,
         media,
       }
     },

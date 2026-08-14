@@ -1,17 +1,59 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Check, ArrowRight } from "lucide-react"
+import {
+  ArrowRight,
+  Check,
+  Sparkles,
+} from "lucide-react"
+
 import { ButtonLink } from "@/components/button-link"
 import { Reveal } from "@/components/reveal"
-import { Eyebrow, SectionHeading } from "@/components/section-heading"
+import {
+  Eyebrow,
+  SectionHeading,
+} from "@/components/section-heading"
 import { PageHero } from "@/components/page-hero"
 import { getServices } from "@/lib/data/services"
 
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Brand strategy, identity, social media, content, campaigns, websites and performance marketing — the full creative stack from The Backstage Marketing.",
-  alternates: { canonical: "/services" },
+    "Branding, social media, content, websites, performance marketing and growth services from The Backstage Marketing.",
+  alternates: {
+    canonical: "/services",
+  },
+}
+
+function formatPrice({
+  prefix,
+  price,
+  suffix,
+}: {
+  prefix?: string
+  price?: string
+  suffix?: string
+}) {
+  if (!price) return null
+
+  return (
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+      {prefix ? (
+        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+          {prefix}
+        </span>
+      ) : null}
+
+      <span className="text-2xl font-black tracking-tight text-ink">
+        {price}
+      </span>
+
+      {suffix ? (
+        <span className="text-sm font-medium text-muted">
+          {suffix}
+        </span>
+      ) : null}
+    </div>
+  )
 }
 
 export default async function ServicesPage() {
@@ -22,93 +64,311 @@ export default async function ServicesPage() {
       <PageHero
         eyebrow="Our services"
         title="Everything your brand needs, under one roof"
-        description="We plug in as your creative and growth partner — from the strategy behind the scenes to the campaigns in the spotlight."
+        description="Choose a major service, explore the individual services inside it, and enquire directly about exactly what your business needs."
       />
 
-      {/* Quick nav */}
+      {/* Quick navigation */}
       <section className="mx-auto w-full max-w-6xl px-5 sm:px-8">
         <div className="flex flex-wrap gap-2 rounded-3xl border border-line bg-card p-4">
-          {services.map((s) => (
+          {services.map((service) => (
             <Link
-              key={s.slug}
-              href={`#${s.slug}`}
-              className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium text-muted transition-colors hover:border-ink hover:text-ink"
+              key={service.slug}
+              href={`#${service.slug}`}
+              className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm font-medium text-muted transition-all hover:-translate-y-0.5 hover:border-ink hover:text-ink"
             >
-              <s.icon className="h-4 w-4 text-accent" aria-hidden="true" />
-              {s.title}
+              <service.icon
+                className="h-4 w-4 text-accent"
+                aria-hidden="true"
+              />
+
+              {service.title}
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Detailed service sections */}
+      {/* Major services */}
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
-        {services.map((service, i) => (
+        {services.map((service, index) => (
           <section
             key={service.slug}
             id={service.slug}
-            className="scroll-mt-28 border-b border-line py-16 last:border-b-0 sm:py-20"
+            className="scroll-mt-28 border-b border-line py-16 last:border-b-0 sm:py-24"
           >
-            <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+            <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+              {/* Service introduction */}
               <Reveal>
-                <div className="flex flex-col gap-5">
+                <div className="flex flex-col items-start gap-5 lg:sticky lg:top-28 lg:self-start">
                   <span className="grid h-14 w-14 place-items-center rounded-2xl bg-ink text-paper">
-                    <service.icon className="h-6 w-6" aria-hidden="true" />
+                    <service.icon
+                      className="h-6 w-6"
+                      aria-hidden="true"
+                    />
                   </span>
-                  <Eyebrow>{`0${i + 1} — ${service.tagline}`}</Eyebrow>
-                  <h2 className="text-balance text-3xl font-black tracking-tight sm:text-4xl">
+
+                  <Eyebrow>
+                    {`${String(index + 1).padStart(2, "0")} — ${service.tagline}`}
+                  </Eyebrow>
+
+                  <h2 className="text-balance text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
                     {service.title}
                   </h2>
-                  <p className="text-pretty text-base leading-relaxed text-muted">{service.description}</p>
-                  <div className="rounded-2xl bg-paper-2/70 p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">Best for</p>
-                    <p className="mt-1 text-sm font-medium text-ink">{service.forWho}</p>
+
+                  <p className="text-pretty text-base leading-relaxed text-muted sm:text-lg">
+                    {service.description}
+                  </p>
+
+                  {service.startingPrice ? (
+                    <div className="w-full rounded-3xl border border-line bg-card p-5">
+                      {formatPrice({
+                        prefix: service.pricePrefix,
+                        price: service.startingPrice,
+                        suffix: service.priceSuffix,
+                      })}
+
+                      {service.pricingNote ? (
+                        <p className="mt-2 text-xs leading-relaxed text-muted">
+                          {service.pricingNote}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
+
+                  <div className="w-full rounded-2xl bg-paper-2/70 p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+                      Best for
+                    </p>
+
+                    <p className="mt-1 text-sm font-medium leading-relaxed text-ink">
+                      {service.forWho}
+                    </p>
                   </div>
+
+                  <ButtonLink
+                    href={`/contact?service=${encodeURIComponent(
+                      service.title,
+                    )}`}
+                    withIcon
+                  >
+                    {service.inquiryButtonText || "Get a quote"}
+                  </ButtonLink>
                 </div>
               </Reveal>
 
-              <Reveal delay={100}>
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <div className="rounded-3xl border border-line bg-card p-6">
-                    <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-ink">What you get</h3>
-                    <ul className="mt-4 flex flex-col gap-3">
-                      {service.deliverables.map((d) => (
-                        <li key={d} className="flex items-start gap-3 text-sm leading-relaxed text-muted">
-                          <Check className="mt-0.5 h-4 w-4 flex-none text-accent" aria-hidden="true" />
-                          {d}
-                        </li>
-                      ))}
-                    </ul>
+              {/* Service details */}
+              <div className="flex flex-col gap-8">
+                <Reveal delay={80}>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <div className="rounded-3xl border border-line bg-card p-6">
+                      <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-ink">
+                        What you get
+                      </h3>
+
+                      <ul className="mt-4 flex flex-col gap-3">
+                        {service.deliverables.map((deliverable) => (
+                          <li
+                            key={deliverable}
+                            className="flex items-start gap-3 text-sm leading-relaxed text-muted"
+                          >
+                            <Check
+                              className="mt-0.5 h-4 w-4 flex-none text-accent"
+                              aria-hidden="true"
+                            />
+
+                            {deliverable}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="rounded-3xl border border-line bg-card p-6">
+                      <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-ink">
+                        Outcomes
+                      </h3>
+
+                      <ul className="mt-4 flex flex-col gap-3">
+                        {service.outcomes.map((outcome) => (
+                          <li
+                            key={outcome}
+                            className="flex items-start gap-3 text-sm leading-relaxed text-muted"
+                          >
+                            <ArrowRight
+                              className="mt-0.5 h-4 w-4 flex-none text-accent"
+                              aria-hidden="true"
+                            />
+
+                            {outcome}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                  <div className="rounded-3xl border border-line bg-card p-6">
-                    <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-ink">Outcomes</h3>
-                    <ul className="mt-4 flex flex-col gap-3">
-                      {service.outcomes.map((o) => (
-                        <li key={o} className="flex items-start gap-3 text-sm leading-relaxed text-muted">
-                          <ArrowRight className="mt-0.5 h-4 w-4 flex-none text-accent" aria-hidden="true" />
-                          {o}
-                        </li>
-                      ))}
-                    </ul>
+                </Reveal>
+
+                {/* Sub-services */}
+                {service.subServices &&
+                service.subServices.length > 0 ? (
+                  <Reveal delay={120}>
+                    <div className="flex flex-col gap-5">
+                      <div>
+                        <Eyebrow>Available services</Eyebrow>
+
+                        <h3 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">
+                          Choose what you need
+                        </h3>
+                      </div>
+
+                      <div className="grid gap-4">
+                        {service.subServices.map(
+                          (subService) => (
+                            <article
+                              key={subService.slug}
+                              id={`${service.slug}-${subService.slug}`}
+                              className="scroll-mt-28 rounded-3xl border border-line bg-card p-6 transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_50px_-28px_rgba(9,9,11,0.28)] sm:p-7"
+                            >
+                              <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+                                <div className="max-w-xl">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <h4 className="text-xl font-black tracking-tight">
+                                      {subService.name}
+                                    </h4>
+
+                                    {subService.featured ? (
+                                      <span className="inline-flex items-center gap-1 rounded-full bg-accent/10 px-2.5 py-1 text-[11px] font-semibold text-accent">
+                                        <Sparkles
+                                          className="h-3 w-3"
+                                          aria-hidden="true"
+                                        />
+
+                                        Popular
+                                      </span>
+                                    ) : null}
+                                  </div>
+
+                                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                                    {subService.summary}
+                                  </p>
+
+                                  {subService.deliverables &&
+                                  subService.deliverables.length >
+                                    0 ? (
+                                    <ul className="mt-4 flex flex-col gap-2">
+                                      {subService.deliverables.map(
+                                        (item) => (
+                                          <li
+                                            key={item}
+                                            className="flex items-start gap-2 text-sm leading-relaxed text-muted"
+                                          >
+                                            <Check
+                                              className="mt-0.5 h-4 w-4 flex-none text-accent"
+                                              aria-hidden="true"
+                                            />
+
+                                            {item}
+                                          </li>
+                                        ),
+                                      )}
+                                    </ul>
+                                  ) : null}
+                                </div>
+
+                                <div className="flex min-w-44 flex-col items-start gap-4 sm:items-end">
+                                  {subService.startingPrice
+                                    ? formatPrice({
+                                        prefix:
+                                          subService.pricePrefix,
+                                        price:
+                                          subService.startingPrice,
+                                        suffix:
+                                          subService.priceSuffix,
+                                      })
+                                    : null}
+
+                                  {subService.pricingNote ? (
+                                    <p className="max-w-48 text-xs leading-relaxed text-muted sm:text-right">
+                                      {subService.pricingNote}
+                                    </p>
+                                  ) : null}
+
+                                  <Link
+                                    href={`/contact?service=${encodeURIComponent(
+                                      service.title,
+                                    )}&subservice=${encodeURIComponent(
+                                      subService.name,
+                                    )}`}
+                                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-paper transition-all hover:-translate-y-0.5 hover:bg-accent"
+                                  >
+                                    {subService.inquiryButtonText ||
+                                      "Get a quote"}
+
+                                    <ArrowRight
+                                      className="h-4 w-4"
+                                      aria-hidden="true"
+                                    />
+                                  </Link>
+                                </div>
+                              </div>
+                            </article>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  </Reveal>
+                ) : null}
+
+                {/* Service inquiry block */}
+                <Reveal delay={150}>
+                  <div className="rounded-[28px] bg-ink p-7 text-paper sm:p-8">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-paper/60">
+                      Enquire
+                    </p>
+
+                    <h3 className="mt-3 text-2xl font-black tracking-tight">
+                      {service.inquiryTitle ||
+                        "Interested in this service?"}
+                    </h3>
+
+                    <p className="mt-3 max-w-xl text-sm leading-relaxed text-paper/70">
+                      {service.inquiryDescription ||
+                        "Tell us about your project and we’ll recommend the right approach."}
+                    </p>
+
+                    <div className="mt-6">
+                      <Link
+                        href={`/contact?service=${encodeURIComponent(
+                          service.title,
+                        )}`}
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-paper px-5 text-sm font-semibold text-ink transition-all hover:-translate-y-0.5"
+                      >
+                        {service.inquiryButtonText ||
+                          "Get a quote"}
+
+                        <ArrowRight
+                          className="h-4 w-4"
+                          aria-hidden="true"
+                        />
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              </Reveal>
+                </Reveal>
+              </div>
             </div>
           </section>
         ))}
       </div>
 
-      {/* CTA */}
+      {/* General inquiry */}
       <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <Reveal>
-          <div className="flex flex-col items-center gap-6 rounded-[32px] border border-line bg-card px-7 py-14 text-center sm:py-16">
+          <div className="flex flex-col items-center gap-6 rounded-[32px] border border-line bg-card px-7 py-14 text-center sm:px-12 sm:py-16">
             <SectionHeading
               align="center"
-              title="Not sure where to start?"
-              description="Book a free discovery call and we'll map out the right mix of services for your goals and budget."
+              title="Not sure which service you need?"
+              description="Tell us about your business, your goals and your budget. We’ll help you work out the right mix of services."
             />
+
             <ButtonLink href="/contact" withIcon>
-              Book a discovery call
+              Make a general inquiry
             </ButtonLink>
           </div>
         </Reveal>

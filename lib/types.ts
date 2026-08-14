@@ -9,7 +9,7 @@
 import type { LucideIcon } from "lucide-react"
 
 /* ------------------------------------------------------------------ */
-/* Sanity image reference                                              */
+/* Sanity image reference                                             */
 /* ------------------------------------------------------------------ */
 
 export type SanityImageRef = {
@@ -20,7 +20,7 @@ export type SanityImageRef = {
 } | null
 
 /* ------------------------------------------------------------------ */
-/* SEO                                                                 */
+/* SEO                                                                */
 /* ------------------------------------------------------------------ */
 
 export type Seo = {
@@ -34,8 +34,15 @@ export type Seo = {
 /* Site settings                                                      */
 /* ------------------------------------------------------------------ */
 
-export type SocialLink = { label: string; href: string }
-export type NavLink = { label: string; href: string }
+export type SocialLink = {
+  label: string
+  href: string
+}
+
+export type NavLink = {
+  label: string
+  href: string
+}
 
 export type SiteSettings = {
   name: string
@@ -58,25 +65,63 @@ export type SiteSettings = {
 /* Services                                                           */
 /* ------------------------------------------------------------------ */
 
+export type ServiceSubService = {
+  name: string
+  slug: string
+  summary: string
+
+  pricePrefix?: string
+  startingPrice?: string
+  priceSuffix?: string
+  pricingNote?: string
+
+  deliverables?: string[]
+
+  featured?: boolean
+  displayOrder?: number
+
+  inquiryButtonText?: string
+}
+
 export type Service = {
   slug: string
   title: string
   tagline: string
   summary: string
   description: string
-  deliverables: string[]
-  forWho: string
-  outcomes: string[]
+
   icon: LucideIcon
   coverImage?: SanityImageRef
+
+  pricePrefix?: string
+  startingPrice?: string
+  priceSuffix?: string
+  pricingNote?: string
+
+  subServices?: ServiceSubService[]
+
+  forWho: string
+  deliverables: string[]
+  outcomes: string[]
+
+  inquiryTitle?: string
+  inquiryDescription?: string
+  inquiryButtonText?: string
+
   featured?: boolean
+  displayOrder?: number
+
+  seo?: Seo
 }
 
 /* ------------------------------------------------------------------ */
 /* Projects                                                           */
 /* ------------------------------------------------------------------ */
 
-export type ProjectResult = { label: string; value: string }
+export type ProjectResult = {
+  label: string
+  value: string
+}
 
 export type Project = {
   slug: string
@@ -121,10 +166,13 @@ export type BlogPost = {
   readingTime: string
   cover: string
   featured?: boolean
+
   /** Legacy structured blocks (fallback content). */
   body?: BlogBlock[]
+
   /** Sanity Portable Text (CMS content). */
   portableBody?: PortableTextBlock[]
+
   seo?: Seo
 }
 
@@ -168,13 +216,20 @@ export type TeamMember = {
 /* Pricing                                                            */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Legacy standalone pricing type.
+ * Keep this temporarily until pricing has been fully migrated into Services.
+ */
 export type PricingPlan = {
   name: string
   pricePrefix: string
   startingPrice: string
   description?: string
   features: string[]
-  cta?: { label: string; href: string }
+  cta?: {
+    label: string
+    href: string
+  }
   featured?: boolean
 }
 
@@ -182,34 +237,58 @@ export type PricingPlan = {
 /* Homepage                                                           */
 /* ------------------------------------------------------------------ */
 
-export type HomepageStat = { value: string; label: string }
-export type HomepageProcessStep = { step: string; title: string; copy: string }
+export type HomepageStat = {
+  value: string
+  label: string
+}
+
+export type HomepageProcessStep = {
+  step: string
+  title: string
+  copy: string
+}
 
 export type Homepage = {
   heroEyebrow: string
   heroTitleLead: string
   heroTitleHighlight: string
   heroDescription: string
-  heroPrimaryCta: { label: string; href: string }
-  heroSecondaryCta: { label: string; href: string }
+
+  heroPrimaryCta: {
+    label: string
+    href: string
+  }
+
+  heroSecondaryCta: {
+    label: string
+    href: string
+  }
+
   heroImage?: SanityImageRef
   heroCardTitle: string
   heroCardTagline: string
+
   stats: HomepageStat[]
   marqueeItems: string[]
+
   servicesEyebrow: string
   servicesTitle: string
   servicesDescription: string
+
   processEyebrow: string
   processTitle: string
   processSteps: HomepageProcessStep[]
+
   workEyebrow: string
   workTitle: string
   workDescription: string
+
   testimonialsEyebrow: string
   testimonialsTitle: string
+
   ctaTitle: string
   ctaDescription: string
+
   seo?: Seo
 }
 
@@ -217,22 +296,36 @@ export type Homepage = {
 /* About page                                                         */
 /* ------------------------------------------------------------------ */
 
-export type AboutValue = { icon: string; title: string; copy: string }
-export type AboutMilestone = { year: string; copy: string }
+export type AboutValue = {
+  icon: string
+  title: string
+  copy: string
+}
+
+export type AboutMilestone = {
+  year: string
+  copy: string
+}
 
 export type AboutPage = {
   heroEyebrow: string
   heroTitle: string
   heroDescription: string
+
   storyEyebrow: string
   storyTitle: string
   storyParagraphs: string[]
+
   milestones: AboutMilestone[]
+
   valuesEyebrow: string
   valuesTitle: string
   values: AboutValue[]
+
   team: TeamMember[]
+
   ctaTitle: string
   ctaDescription: string
+
   seo?: Seo
 }

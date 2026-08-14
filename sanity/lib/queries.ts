@@ -194,21 +194,55 @@ export const servicesQuery = groq`
       title asc
     ){
     "slug": slug.current,
+
     title,
     tagline,
     icon,
     summary,
     description,
-    deliverables,
-    forWho,
-    outcomes,
 
     "coverImage": coverImage{
       ${imageFields}
     }.image,
 
+    pricePrefix,
+    startingPrice,
+    priceSuffix,
+    pricingNote,
+
+    "subServices": subServices[]
+      | order(
+          displayOrder asc,
+          name asc
+        ){
+        name,
+        "slug": slug.current,
+        summary,
+
+        pricePrefix,
+        startingPrice,
+        priceSuffix,
+        pricingNote,
+
+        deliverables,
+
+        featured,
+        displayOrder,
+        inquiryButtonText
+      },
+
+    forWho,
+    deliverables,
+    outcomes,
+
+    inquiryTitle,
+    inquiryDescription,
+    inquiryButtonText,
+
     featured,
-    displayOrder
+    displayOrder,
+
+    ${seoFields}
   }
 `
 
