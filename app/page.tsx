@@ -172,7 +172,7 @@ export default async function HomePage() {
           {services.map((service, index) => (
             <Reveal key={service.slug} delay={index * 60}>
               <Link
-                href={`/services#${service.slug}`}
+                href={`/services/${service.slug}`}
                 className="group flex h-full flex-col gap-4 rounded-3xl border border-line bg-card p-7 transition-all hover:-translate-y-1 hover:border-ink/20 hover:shadow-[0_18px_50px_-24px_rgba(9,9,11,0.35)]"
               >
                 <span className="grid h-12 w-12 place-items-center rounded-2xl bg-ink text-paper transition-colors group-hover:bg-accent">
